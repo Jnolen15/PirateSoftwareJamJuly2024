@@ -24,17 +24,34 @@ public class GameGrid : MonoBehaviour
     [SerializeField] private GameObject _flower;
     [SerializeField] private int _gridSizeX;
     [SerializeField] private int _gridSizeY;
+    [SerializeField] private int _minComboSize;
 
-    private Dictionary<Vector2Int, Flower> _flowerDict = new();
+    private Dictionary<Vector2Int, FlowerEntry> _flowerDict = new();
 
-    [SerializeField] private float _gameTickInterval;
     [SerializeField] private float _curGameTick;
-
-    [SerializeField] private int _numGameTick;
+    [SerializeField] private bool _inGameTick;
+    [SerializeField] private int _purpleScore;
+    [SerializeField] private int _greenScore;
+    [SerializeField] private int _orangeScore;
 
     public delegate void OnGameTick();
     public static event OnGameTick GameTick;
-    public static event OnGameTick EnemyGameTick;
+
+    public class FlowerEntry
+    {
+        public Flower Flower;
+        public Vector2Int GridPos;
+        public int ComboID;
+        public bool CheckedForCombo;
+
+        public FlowerEntry(Flower flower, Vector2Int gridPos, int comboID)
+        {
+            Flower = flower;
+            GridPos = gridPos;
+            ComboID = comboID;
+            CheckedForCombo = false;
+        }
+    }
     #endregion
 
     //============== Setup ==============
@@ -86,51 +103,133 @@ public class GameGrid : MonoBehaviour
         flower.transform.position = _gameGrid.GetCellCenterWorld(new Vector3Int(x, y, 0));
 
         Vector2Int tilePos = new Vector2Int(x, y);
-        _flowerDict.Add(tilePos, flower);
+        _flowerDict.Add(tilePos, new FlowerEntry(flower, tilePos, - 1));
         flower.Setup(tilePos, this);
     }
     #endregion
 
     //============== Function ==============
     #region Function
-    private void Update()
-    {
-        if (_curGameTick >= _gameTickInterval)
-        {
-            _curGameTick = 0;
-            //DoGameTick();
-        }
-        else
-            _curGameTick += Time.deltaTime;
-    }
-
     public void DoGameTick()
     {
+        if (_inGameTick)
+            return;
+
+        StartCoroutine(GameTickCoroutine());
+    }
+
+    private IEnumerator GameTickCoroutine()
+    {
+        _inGameTick = true;
+
+        // Reset combo groups
+        foreach (FlowerEntry entry in _flowerDict.Values)
+        {
+            entry.ComboID = -1;
+            entry.CheckedForCombo = false;
+        }
+
+        yield return new WaitForSeconds(0.5f);
+
+        // Search and score combos
+        SearchForCombos();
+
         GameTick?.Invoke();
 
-        _numGameTick++;
+        _inGameTick = false;
+    }
 
-        //// enemy tick every 3
-        //if(_numGameTick % 3 == 0)
-        //{
-        //    EnemyGameTick?.Invoke();
+    private void SearchForCombos()
+    {
+        for (int x = 0; x < _gridSizeX; x++)
+        {
+            for (int y = 0; y < _gridSizeY; y++)
+            {
+                Vector2Int checkingPos = new Vector2Int(x - _gridSizeX / 2, y - _gridSizeY / 2);
+                if (_flowerDict.ContainsKey(checkingPos))
+                {
+                    if (_flowerDict[checkingPos] != null)
+                    {
+                        if (!_flowerDict[checkingPos].CheckedForCombo)
+                        {
+                            // If flower there, check if it makes a combo
+                            int comboID = Random.Range(0, 100000);
+                            List<FlowerEntry> flowerList = new();
+                            Flower flower = _flowerDict[checkingPos].Flower;
+                            flowerList.Add(_flowerDict[checkingPos]);
+                            _flowerDict[checkingPos].ComboID = comboID;
+                            _flowerDict[checkingPos].CheckedForCombo = true;
+                            flower.SetComboID(comboID);
+                            CheckFlowerCombo(flowerList, flower, comboID);
 
-        //    // Spawn enemy
-        //    int rand = Random.Range(0, 3);
-        //    if (rand < 2)
-        //    {
-        //        int num = Random.Range(2, 5);
-        //        for (int i = 0; i < num; i++)
-        //        {
-        //            MakeNewFlower(Random.Range(0 - _gridSizeX / 2, _gridSizeX / 2), _gridSizeY / 2 - 1);
-        //        }
-        //    }
-        //}
+                            Debug.Log($"{flower.GetEnergy()} Flower combo list was {flowerList.Count}");
+                            if (flowerList.Count >= _minComboSize && (flower.GetEnergy() == Flower.Energy.Green || flower.GetEnergy() == Flower.Energy.Orange || flower.GetEnergy() == Flower.Energy.Purple))
+                                ScoreCombo(flowerList);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void CheckFlowerCombo(List<FlowerEntry> flowerList, Flower prevFlower, int comboID)
+    {
+        Vector2Int pos = prevFlower.GetGridPosition();
+        CheckFlowerNeighbors(flowerList, prevFlower, new Vector2Int(pos.x + 1, pos.y), comboID);
+        CheckFlowerNeighbors(flowerList, prevFlower, new Vector2Int(pos.x - 1, pos.y), comboID);
+        CheckFlowerNeighbors(flowerList, prevFlower, new Vector2Int(pos.x, pos.y + 1), comboID);
+        CheckFlowerNeighbors(flowerList, prevFlower, new Vector2Int(pos.x, pos.y - 1), comboID);
+    }
+
+    private void CheckFlowerNeighbors(List<FlowerEntry> flowerList, Flower prevFlower, Vector2Int flowerPos, int comboID)
+    {
+        if (!_flowerDict.ContainsKey(flowerPos))
+            return;
+
+        if (_flowerDict[flowerPos] == null)
+            return;
+
+        // If flower there, check if it matches
+        FlowerEntry flowerEntry = _flowerDict[flowerPos];
+        if (prevFlower.GetEnergy() == flowerEntry.Flower.GetEnergy())
+        {
+            if (!flowerList.Contains(flowerEntry))
+            {
+                flowerList.Add(flowerEntry);
+                flowerEntry.ComboID = comboID;
+                flowerEntry.CheckedForCombo = true;
+                flowerEntry.Flower.SetComboID(comboID);
+                CheckFlowerCombo(flowerList, flowerEntry.Flower, comboID);
+            }
+        }
+    }
+
+    private void ScoreCombo(List<FlowerEntry> flowerList)
+    {
+        foreach (FlowerEntry fe in flowerList)
+        {
+            if (_flowerDict.ContainsKey(fe.GridPos))
+            {
+                if (fe.Flower.GetEnergy() == Flower.Energy.Green)
+                    _greenScore++;
+                else if (fe.Flower.GetEnergy() == Flower.Energy.Purple)
+                    _purpleScore++;
+                else if (fe.Flower.GetEnergy() == Flower.Energy.Orange)
+                    _orangeScore++;
+
+                _flowerDict.Remove(fe.GridPos);
+                Destroy(fe.Flower.gameObject);
+            }
+            else
+            {
+                Debug.Log("Flower can not be scored! not found in dictionary");
+            }
+        }
     }
 
     public void ColorFlower(Vector2Int flowerPos, Flower.Energy Catalyst)
     {
-        Debug.Log($"{Catalyst} Potion burst at tile {flowerPos}");
+        //Debug.Log($"{Catalyst} Potion burst at tile {flowerPos}");
 
         if (!_flowerDict.ContainsKey(flowerPos))
         {
@@ -138,8 +237,18 @@ public class GameGrid : MonoBehaviour
             return;
         }
 
-        Debug.Log($"Tile {flowerPos} found, painting...");
-        _flowerDict[flowerPos].Paint(Catalyst);
+        //Debug.Log($"Tile {flowerPos} found, painting...");
+        _flowerDict[flowerPos].Flower.Paint(Catalyst);
+    }
+
+    public Vector2Int MoveDown(Vector2Int curPos, Transform trans)
+    {
+        Vector2Int newPos = new Vector2Int(curPos.x, curPos.y - 1);
+
+        //Vector3Int transCell = _gameGrid.WorldToCell(trans.position);
+        trans.position = _gameGrid.GetCellCenterWorld(new Vector3Int(newPos.x, newPos.y, 0));
+
+        return newPos;
     }
     #endregion
 
@@ -154,7 +263,7 @@ public class GameGrid : MonoBehaviour
     {
         if (_flowerDict.ContainsKey(pos))
         {
-            return _flowerDict[pos].GetEnergy();
+            return _flowerDict[pos].Flower.GetEnergy();
         }
         else
         {
@@ -163,27 +272,17 @@ public class GameGrid : MonoBehaviour
         }
     }
 
-    public Vector2Int MoveDown(Vector2Int curPos, Transform trans)
-    {
-        Vector2Int newPos = new Vector2Int(curPos.x, curPos.y -1);
-
-        //Vector3Int transCell = _gameGrid.WorldToCell(trans.position);
-        trans.position = _gameGrid.GetCellCenterWorld(new Vector3Int(newPos.x, newPos.y, 0));
-
-        return newPos;
-    }
-
     public bool CheckMatchingTile(Vector2Int curPos, Flower.Energy liquid)
     {
         if (_flowerDict.ContainsKey(curPos))
-            return (_flowerDict[curPos].GetEnergy() == liquid);
+            return (_flowerDict[curPos].Flower.GetEnergy() == liquid);
         else
             return false;
     }
 
     public void ClearTile(Vector2Int curPos)
     {
-        _flowerDict[curPos].SetEnergy(Flower.Energy.White);
+        _flowerDict[curPos].Flower.SetEnergy(Flower.Energy.White);
     }
     #endregion
 }

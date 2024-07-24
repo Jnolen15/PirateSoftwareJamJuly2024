@@ -35,9 +35,6 @@ public class Bullet : MonoBehaviour
 
     private void OnDestroy()
     {
-        Vector3 gridSize = GameGrid.Instance.GetGridSize();
-        Vector2 deathPos = transform.position;
-
         GameGrid.Instance.DoGameTick();
     }
 

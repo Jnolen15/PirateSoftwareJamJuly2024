@@ -35,6 +35,7 @@ public class Flower : MonoBehaviour
     [SerializeField] private SpriteRenderer _sr;
 
     [SerializeField] private TextMeshProUGUI _coords;
+    [SerializeField] private TextMeshProUGUI _comboID;
 
     private int _brownWiltTime;
     #endregion
@@ -95,17 +96,22 @@ public class Flower : MonoBehaviour
 
     private void GameTick()
     {
-        if(_energy == Energy.Brown)
-        {
-            if(_brownWiltTime >= 1)
-            {
-                _brownWiltTime = 0;
-                _energy = Energy.White;
-                ColorFlower();
-            }
-            else
-                _brownWiltTime++;
-        }
+        //if(_energy == Energy.Brown)
+        //{
+        //    if(_brownWiltTime >= 1)
+        //    {
+        //        _brownWiltTime = 0;
+        //        _energy = Energy.White;
+        //        ColorFlower();
+        //    }
+        //    else
+        //        _brownWiltTime++;
+        //}
+    }
+
+    public void SetComboID(int comboID)
+    {
+        _comboID.text = comboID.ToString();
     }
 
     public void Paint(Energy nrg)
@@ -165,7 +171,10 @@ public class Flower : MonoBehaviour
                 break;
         }
         message += ($" made {_energy}");
-        Debug.Log(message);
+        //Debug.Log(message);
+
+        if (prevNrg == _energy)
+            return;
 
         ColorFlower();
 

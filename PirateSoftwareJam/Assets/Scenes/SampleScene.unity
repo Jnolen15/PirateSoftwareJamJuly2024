@@ -840,9 +840,12 @@ MonoBehaviour:
   _flower: {fileID: 2623174517603822929, guid: 11e40cdc0c11db3498bb9598367a3d5d, type: 3}
   _gridSizeX: 10
   _gridSizeY: 12
-  _gameTickInterval: 3
+  _minComboSize: 5
   _curGameTick: 0
-  _numGameTick: 0
+  _inGameTick: 0
+  _purpleScore: 0
+  _greenScore: 0
+  _orangeScore: 0
 --- !u!1 &1804387765
 GameObject:
   m_ObjectHideFlags: 0

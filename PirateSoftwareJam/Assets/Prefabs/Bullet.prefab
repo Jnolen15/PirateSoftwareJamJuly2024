@@ -162,4 +162,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _liveTime: 10
-  _liquid: 0
+  _energy: 0

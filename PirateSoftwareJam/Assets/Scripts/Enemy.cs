@@ -23,17 +23,17 @@ public class Enemy : MonoBehaviour
 
     //============== Setup ==============
     #region Setup
-    private void Start()
-    {
-        GameGrid.GameTick += CheckKill;
-        GameGrid.EnemyGameTick += Move;
-    }
+    //private void Start()
+    //{
+    //    GameGrid.GameTick += CheckKill;
+    //    GameGrid.EnemyGameTick += Move;
+    //}
 
-    private void OnDestroy()
-    {
-        GameGrid.GameTick -= CheckKill;
-        GameGrid.EnemyGameTick -= Move;
-    }
+    //private void OnDestroy()
+    //{
+    //    GameGrid.GameTick -= CheckKill;
+    //    GameGrid.EnemyGameTick -= Move;
+    //}
 
     public void Setup(Vector2Int gridPos, GameGrid grid)
     {
