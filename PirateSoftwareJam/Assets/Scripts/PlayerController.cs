@@ -9,8 +9,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Grid _gameGrid;
     [SerializeField] private GameObject _bullet;
     [SerializeField] private float _bulletSpeed;
+    [SerializeField] private SpriteRenderer _backupPotionSR;
     private SpriteRenderer _sr;
     private Tile.Liquid _nextLiquid;
+    private Tile.Liquid _backupLiquid;
     private bool _shotLoaded;
     #endregion
 
@@ -22,6 +24,14 @@ public class PlayerController : MonoBehaviour
 
         _sr = this.GetComponent<SpriteRenderer>();
 
+        // Pick an initial backup color
+        int rand = Random.Range(1, 4);
+        if (rand == 1)
+            _backupLiquid = Tile.Liquid.Red;
+        else if (rand == 2)
+            _backupLiquid = Tile.Liquid.Yellow;
+        else if (rand == 3)
+            _backupLiquid = Tile.Liquid.Blue;
         GetNewLiquid();
         _shotLoaded = true;
     }
@@ -50,6 +60,11 @@ public class PlayerController : MonoBehaviour
             GetNewLiquid();
             GameGrid.Instance.DoGameTick();
         }
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            SwapPotions();
+        }
     }
 
     private void GameTick()
@@ -68,24 +83,40 @@ public class PlayerController : MonoBehaviour
         GetNewLiquid();
     }
 
+    private void SwapPotions()
+    {
+        Tile.Liquid temp = _nextLiquid;
+        _nextLiquid = _backupLiquid;
+        _backupLiquid = temp;
+
+        ColorSprite(_nextLiquid, _sr);
+        ColorSprite(_backupLiquid, _backupPotionSR);
+    }
+
     private void GetNewLiquid()
     {
+        _nextLiquid = _backupLiquid;
+
         int rand = Random.Range(1, 4);
         if (rand == 1)
-        {
-            _nextLiquid = Tile.Liquid.Red;
-            _sr.color = Color.red;
-        }
+            _backupLiquid = Tile.Liquid.Red;
         else if (rand == 2)
-        {
-            _nextLiquid = Tile.Liquid.Yellow;
-            _sr.color = Color.yellow;
-        }
+            _backupLiquid = Tile.Liquid.Yellow;
         else if (rand == 3)
-        {
-            _nextLiquid = Tile.Liquid.Blue;
-            _sr.color = Color.blue;
-        }
+            _backupLiquid = Tile.Liquid.Blue;
+
+        ColorSprite(_nextLiquid, _sr);
+        ColorSprite(_backupLiquid, _backupPotionSR);
+    }
+
+    private void ColorSprite(Tile.Liquid liquid, SpriteRenderer sr)
+    {
+        if (liquid == Tile.Liquid.Red)
+            sr.color = Color.red;
+        else if (liquid == Tile.Liquid.Yellow)
+            sr.color = Color.yellow;
+        else if (liquid == Tile.Liquid.Blue)
+            sr.color = Color.blue;
     }
     #endregion
 }

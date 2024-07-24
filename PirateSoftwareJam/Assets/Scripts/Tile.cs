@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class Tile : MonoBehaviour
 {
@@ -31,6 +32,8 @@ public class Tile : MonoBehaviour
 
     [SerializeField] private GameGrid _grid;
     [SerializeField] private SpriteRenderer _sr;
+
+    private int _brownEvaporationTime;
     #endregion
 
     //============== Setup ==============
@@ -71,11 +74,17 @@ public class Tile : MonoBehaviour
 
     private void GameTick()
     {
-        //if(_liquid == Liquid.Brown)
-        //{
-        //    _liquid = Liquid.White;
-        //    ColorTile();
-        //}
+        if(_liquid == Liquid.Brown)
+        {
+            if(_brownEvaporationTime >= 1)
+            {
+                _brownEvaporationTime = 0;
+                _liquid = Liquid.White;
+                ColorTile();
+            }
+            else
+                _brownEvaporationTime++;
+        }
     }
 
     public void Paint(Liquid liquid)
@@ -141,35 +150,38 @@ public class Tile : MonoBehaviour
 
     private void ColorTile()
     {
+        Color toColor = Color.white;
         switch (_liquid)
         {
             case Liquid.White:
-                _sr.color = Color.white;
+                toColor = Color.white;
                 break;
             case Liquid.Red:
-                _sr.color = _red;
+                toColor = _red;
                 break;
             case Liquid.Yellow:
-                _sr.color = _yellow;
+                toColor = _yellow;
                 break;
             case Liquid.Blue:
-                _sr.color = _blue;
+                toColor = _blue;
                 break;
             case Liquid.Green:
-                _sr.color = _green;
+                toColor = _green;
                 break;
             case Liquid.Purple:
-                _sr.color = _purple;
+                toColor = _purple;
                 break;
             case Liquid.Orange:
-                _sr.color = _orange;
+                toColor = _orange;
                 break;
             case Liquid.Brown:
-                _sr.color = _brown;
+                toColor = _brown;
                 break;
             default:
                 break;
         }
+
+        _sr.DOColor(toColor, 1f);
     }
     #endregion
 }

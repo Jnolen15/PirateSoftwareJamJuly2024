@@ -45,18 +45,18 @@ public class Enemy : MonoBehaviour
         transform.localScale = _grid.GetGridSize() * 0.9f;
 
         // Assign weakness
-        int rand = Random.Range(1, 7);
+        int rand = Random.Range(1, 4);
+        //if (rand == 1)
+        //    _weakness = Tile.Liquid.Red;
+        //else if (rand == 2)
+        //    _weakness = Tile.Liquid.Yellow;
+        //else if (rand == 3)
+        //    _weakness = Tile.Liquid.Blue;
         if (rand == 1)
-            _weakness = Tile.Liquid.Red;
-        else if (rand == 2)
-            _weakness = Tile.Liquid.Yellow;
-        else if (rand == 3)
-            _weakness = Tile.Liquid.Blue;
-        else if (rand == 4)
             _weakness = Tile.Liquid.Green;
-        else if (rand == 5)
+        else if (rand == 2)
             _weakness = Tile.Liquid.Purple;
-        else if (rand == 6)
+        else if (rand == 3)
             _weakness = Tile.Liquid.Orange;
 
         ColorEnemy();
