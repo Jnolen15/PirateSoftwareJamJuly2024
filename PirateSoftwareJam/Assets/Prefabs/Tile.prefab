@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7331279565472873978}
   - component: {fileID: 517577003548157135}
-  - component: {fileID: -2049161813699437426}
+  - component: {fileID: -6459434637082710203}
   m_Layer: 0
   m_Name: Tile
   m_TagString: Untagged
@@ -85,7 +85,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &-2049161813699437426
+--- !u!114 &-6459434637082710203
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -94,17 +94,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 9134505994041873239}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9bded73a8df1d5242b832a3a95ec34eb, type: 3}
+  m_Script: {fileID: 11500000, guid: e9da48373b25fe24ba29ebcbcde26c0d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _liquid: 0
-  _red: {r: 1, g: 0, b: 0, a: 1}
-  _yellow: {r: 1, g: 0.9420621, b: 0, a: 1}
-  _blue: {r: 0, g: 0.04350853, b: 1, a: 1}
-  _green: {r: 0.025951147, g: 1, b: 0, a: 1}
-  _purple: {r: 0.66946316, g: 0, b: 1, a: 1}
-  _orange: {r: 1, g: 0.48557165, b: 0, a: 1}
-  _brown: {r: 0.16037738, g: 0.109692074, b: 0.109692074, a: 1}
   _gridPos: {x: 0, y: 0}
   _grid: {fileID: 0}
-  _sr: {fileID: 0}

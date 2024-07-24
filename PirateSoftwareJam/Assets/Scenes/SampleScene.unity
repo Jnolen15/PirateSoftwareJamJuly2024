@@ -837,7 +837,7 @@ MonoBehaviour:
   _gameGrid: {fileID: 1447121815}
   _gridTile: {fileID: 9134505994041873239, guid: 81416ff6f6f6ffc4e8b9ca86ac8232ad, type: 3}
   _gridWall: {fileID: 6479440025202831129, guid: e872a34b7359b5041aedeb151c55c23e, type: 3}
-  _enemy: {fileID: 6762245345985472705, guid: a72e88585e7056448a68b08184e4f96d, type: 3}
+  _flower: {fileID: 2623174517603822929, guid: 11e40cdc0c11db3498bb9598367a3d5d, type: 3}
   _gridSizeX: 10
   _gridSizeY: 12
   _gameTickInterval: 3

@@ -11,8 +11,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float _bulletSpeed;
     [SerializeField] private SpriteRenderer _backupPotionSR;
     private SpriteRenderer _sr;
-    private Tile.Liquid _nextLiquid;
-    private Tile.Liquid _backupLiquid;
+    private Flower.Energy _nextEnergy;
+    private Flower.Energy _backupEnergy;
     private bool _shotLoaded;
     #endregion
 
@@ -27,11 +27,11 @@ public class PlayerController : MonoBehaviour
         // Pick an initial backup color
         int rand = Random.Range(1, 4);
         if (rand == 1)
-            _backupLiquid = Tile.Liquid.Red;
+            _backupEnergy = Flower.Energy.Red;
         else if (rand == 2)
-            _backupLiquid = Tile.Liquid.Yellow;
+            _backupEnergy = Flower.Energy.Yellow;
         else if (rand == 3)
-            _backupLiquid = Tile.Liquid.Blue;
+            _backupEnergy = Flower.Energy.Blue;
         GetNewLiquid();
         _shotLoaded = true;
     }
@@ -78,44 +78,44 @@ public class PlayerController : MonoBehaviour
 
         Vector3 bulletDir = dir.normalized;
         Bullet bullet = Instantiate(_bullet, transform.position, transform.rotation).GetComponent<Bullet>();
-        bullet.Setup(bulletDir, _bulletSpeed, _nextLiquid);
+        bullet.Setup(bulletDir, _bulletSpeed, _nextEnergy);
 
         GetNewLiquid();
     }
 
     private void SwapPotions()
     {
-        Tile.Liquid temp = _nextLiquid;
-        _nextLiquid = _backupLiquid;
-        _backupLiquid = temp;
+        Flower.Energy temp = _nextEnergy;
+        _nextEnergy = _backupEnergy;
+        _backupEnergy = temp;
 
-        ColorSprite(_nextLiquid, _sr);
-        ColorSprite(_backupLiquid, _backupPotionSR);
+        ColorSprite(_nextEnergy, _sr);
+        ColorSprite(_backupEnergy, _backupPotionSR);
     }
 
     private void GetNewLiquid()
     {
-        _nextLiquid = _backupLiquid;
+        _nextEnergy = _backupEnergy;
 
         int rand = Random.Range(1, 4);
         if (rand == 1)
-            _backupLiquid = Tile.Liquid.Red;
+            _backupEnergy = Flower.Energy.Red;
         else if (rand == 2)
-            _backupLiquid = Tile.Liquid.Yellow;
+            _backupEnergy = Flower.Energy.Yellow;
         else if (rand == 3)
-            _backupLiquid = Tile.Liquid.Blue;
+            _backupEnergy = Flower.Energy.Blue;
 
-        ColorSprite(_nextLiquid, _sr);
-        ColorSprite(_backupLiquid, _backupPotionSR);
+        ColorSprite(_nextEnergy, _sr);
+        ColorSprite(_backupEnergy, _backupPotionSR);
     }
 
-    private void ColorSprite(Tile.Liquid liquid, SpriteRenderer sr)
+    private void ColorSprite(Flower.Energy nrg, SpriteRenderer sr)
     {
-        if (liquid == Tile.Liquid.Red)
+        if (nrg == Flower.Energy.Red)
             sr.color = Color.red;
-        else if (liquid == Tile.Liquid.Yellow)
+        else if (nrg == Flower.Energy.Yellow)
             sr.color = Color.yellow;
-        else if (liquid == Tile.Liquid.Blue)
+        else if (nrg == Flower.Energy.Blue)
             sr.color = Color.blue;
     }
     #endregion

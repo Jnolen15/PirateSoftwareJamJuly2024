@@ -21,11 +21,11 @@ public class GameGrid : MonoBehaviour
     [SerializeField] private Grid _gameGrid;
     [SerializeField] private GameObject _gridTile;
     [SerializeField] private GameObject _gridWall;
-    [SerializeField] private GameObject _enemy;
+    [SerializeField] private GameObject _flower;
     [SerializeField] private int _gridSizeX;
     [SerializeField] private int _gridSizeY;
 
-    private Dictionary<Vector2Int, Tile> _tileDict = new();
+    private Dictionary<Vector2Int, Flower> _flowerDict = new();
 
     [SerializeField] private float _gameTickInterval;
     [SerializeField] private float _curGameTick;
@@ -46,55 +46,48 @@ public class GameGrid : MonoBehaviour
         {
             for (int y = 0; y < _gridSizeY; y++)
             {
-                MakeNewTile(x - _gridSizeX / 2, y - _gridSizeY / 2);
+                MakeNewTile(_gridTile, x - _gridSizeX / 2, y - _gridSizeY / 2);
             }
         }
 
         // Right wall
         for (int y = 0; y < _gridSizeY; y++)
         {
-            MakeNewWall(_gridSizeX / 2, y - _gridSizeY / 2);
+            MakeNewTile(_gridWall, _gridSizeX / 2, y - _gridSizeY / 2);
         }
 
         // Left wall
         for (int y = 0; y < _gridSizeY; y++)
         {
-            MakeNewWall(-1 - _gridSizeX / 2, y - _gridSizeY / 2);
+            MakeNewTile(_gridWall, -1 - _gridSizeX / 2, y - _gridSizeY / 2);
         }
 
-        // Enemy
-        MakeNewEnemy(Random.Range(0 - _gridSizeX / 2, _gridSizeX / 2), _gridSizeY / 2 - 1);
-        MakeNewEnemy(Random.Range(0 - _gridSizeX / 2, _gridSizeX / 2), _gridSizeY / 2 - 1);
-        MakeNewEnemy(Random.Range(0 - _gridSizeX / 2, _gridSizeX / 2), _gridSizeY / 2 - 1);
-        MakeNewEnemy(Random.Range(0 - _gridSizeX / 2, _gridSizeX / 2), _gridSizeY / 2 - 1);
-        MakeNewEnemy(Random.Range(0 - _gridSizeX / 2, _gridSizeX / 2), _gridSizeY / 2 - 1);
-        MakeNewEnemy(Random.Range(0 - _gridSizeX / 2, _gridSizeX / 2), _gridSizeY / 2 - 1);
+        // Flowers
+        for (int x = 0; x < _gridSizeX; x++)
+        {
+            for (int y = _gridSizeY / 2; y < _gridSizeY; y++)
+            {
+                MakeNewFlower(x - _gridSizeX / 2, y - _gridSizeY / 2);
+            }
+        }
     }
 
-    private void MakeNewTile(int x, int y)
+    private void MakeNewTile(GameObject obj, int x, int y)
     {
-        Tile tile = Instantiate(_gridTile).GetComponent<Tile>();
+        Tile tile = Instantiate(obj, transform).GetComponent<Tile>();
         tile.transform.position = _gameGrid.GetCellCenterWorld(new Vector3Int(x, y, 0));
-
         Vector2Int tilePos = new Vector2Int(x, y);
-        _tileDict.Add(tilePos, tile);
         tile.Setup(tilePos, this);
     }
 
-    private void MakeNewWall(int x, int y)
+    private void MakeNewFlower(int x, int y)
     {
-        Wall wall = Instantiate(_gridWall).GetComponent<Wall>();
-        wall.transform.position = _gameGrid.GetCellCenterWorld(new Vector3Int(x, y, 0));
-        Vector2Int tilePos = new Vector2Int(x, y);
-        wall.Setup(tilePos, this);
-    }
+        Flower flower = Instantiate(_flower).GetComponent<Flower>();
+        flower.transform.position = _gameGrid.GetCellCenterWorld(new Vector3Int(x, y, 0));
 
-    private void MakeNewEnemy(int x, int y)
-    {
-        Enemy enemy = Instantiate(_enemy).GetComponent<Enemy>();
-        enemy.transform.position = _gameGrid.GetCellCenterWorld(new Vector3Int(x, y, 0));
-        Vector2Int enemyPos = new Vector2Int(x, y);
-        enemy.Setup(enemyPos, this);
+        Vector2Int tilePos = new Vector2Int(x, y);
+        _flowerDict.Add(tilePos, flower);
+        flower.Setup(tilePos, this);
     }
     #endregion
 
@@ -117,38 +110,36 @@ public class GameGrid : MonoBehaviour
 
         _numGameTick++;
 
-        // enemy tick every 3
-        if(_numGameTick % 3 == 0)
-        {
-            EnemyGameTick?.Invoke();
+        //// enemy tick every 3
+        //if(_numGameTick % 3 == 0)
+        //{
+        //    EnemyGameTick?.Invoke();
 
-            // Spawn enemy
-            int rand = Random.Range(0, 3);
-            if (rand < 2)
-            {
-                int num = Random.Range(2, 5);
-                for (int i = 0; i < num; i++)
-                {
-                    MakeNewEnemy(Random.Range(0 - _gridSizeX / 2, _gridSizeX / 2), _gridSizeY / 2 - 1);
-                }
-            }
-        }
+        //    // Spawn enemy
+        //    int rand = Random.Range(0, 3);
+        //    if (rand < 2)
+        //    {
+        //        int num = Random.Range(2, 5);
+        //        for (int i = 0; i < num; i++)
+        //        {
+        //            MakeNewFlower(Random.Range(0 - _gridSizeX / 2, _gridSizeX / 2), _gridSizeY / 2 - 1);
+        //        }
+        //    }
+        //}
     }
 
-    public void PaintGridSpace(Vector2 worldPos, Tile.Liquid liquid)
+    public void ColorFlower(Vector2Int flowerPos, Flower.Energy Catalyst)
     {
-        Vector3Int cellPosV3 = _gameGrid.WorldToCell(worldPos);
-        Vector2Int cellPosV2 = new Vector2Int(cellPosV3.x, cellPosV3.y);
+        Debug.Log($"{Catalyst} Potion burst at tile {flowerPos}");
 
-        Debug.Log($"{liquid} Potion burst at world pos {worldPos}, tile {cellPosV2}");
-
-        if (_tileDict.ContainsKey(cellPosV2))
+        if (!_flowerDict.ContainsKey(flowerPos))
         {
-            Debug.Log($"Tile {cellPosV2} found, painting...");
-            _tileDict[cellPosV2].Paint(liquid);
+            Debug.Log($"Tile {flowerPos} not found!");
+            return;
         }
-        else
-            Debug.Log($"Tile {cellPosV2} not found!");
+
+        Debug.Log($"Tile {flowerPos} found, painting...");
+        _flowerDict[flowerPos].Paint(Catalyst);
     }
     #endregion
 
@@ -157,6 +148,19 @@ public class GameGrid : MonoBehaviour
     public Vector3 GetGridSize()
     {
         return _gameGrid.cellSize;
+    }
+
+    public Flower.Energy GetFlowerEnergyAt(Vector2Int pos)
+    {
+        if (_flowerDict.ContainsKey(pos))
+        {
+            return _flowerDict[pos].GetEnergy();
+        }
+        else
+        {
+            Debug.Log($"Tile {pos} not found!");
+            return Flower.Energy.White;
+        }
     }
 
     public Vector2Int MoveDown(Vector2Int curPos, Transform trans)
@@ -169,17 +173,17 @@ public class GameGrid : MonoBehaviour
         return newPos;
     }
 
-    public bool CheckMatchingTile(Vector2Int curPos, Tile.Liquid liquid)
+    public bool CheckMatchingTile(Vector2Int curPos, Flower.Energy liquid)
     {
-        if (_tileDict.ContainsKey(curPos))
-            return (_tileDict[curPos].GetLiquid() == liquid);
+        if (_flowerDict.ContainsKey(curPos))
+            return (_flowerDict[curPos].GetEnergy() == liquid);
         else
             return false;
     }
 
     public void ClearTile(Vector2Int curPos)
     {
-        _tileDict[curPos].SetLiquid(Tile.Liquid.White);
+        _flowerDict[curPos].SetEnergy(Flower.Energy.White);
     }
     #endregion
 }

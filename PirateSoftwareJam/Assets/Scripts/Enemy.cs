@@ -14,7 +14,7 @@ public class Enemy : MonoBehaviour
     [SerializeField] private Color _orange;
     [SerializeField] private Color _brown;
 
-    [SerializeField] private Tile.Liquid _weakness;
+    [SerializeField] private Flower.Energy _weakness;
     [SerializeField] private Vector2Int _gridPos;
 
     [SerializeField] private GameGrid _grid;
@@ -52,51 +52,51 @@ public class Enemy : MonoBehaviour
         //    _weakness = Tile.Liquid.Yellow;
         //else if (rand == 3)
         //    _weakness = Tile.Liquid.Blue;
-        if (rand == 1)
-            _weakness = Tile.Liquid.Green;
-        else if (rand == 2)
-            _weakness = Tile.Liquid.Purple;
-        else if (rand == 3)
-            _weakness = Tile.Liquid.Orange;
+        //if (rand == 1)
+        //    _weakness = Tile.Liquid.Green;
+        //else if (rand == 2)
+        //    _weakness = Tile.Liquid.Purple;
+        //else if (rand == 3)
+        //    _weakness = Tile.Liquid.Orange;
 
-        ColorEnemy();
+        //ColorEnemy();
     }
     #endregion
 
     //============== Function ==============
     #region Function
-    private void ColorEnemy()
-    {
-        switch (_weakness)
-        {
-            case Tile.Liquid.White:
-                _sr.color = Color.white;
-                break;
-            case Tile.Liquid.Red:
-                _sr.color = _red;
-                break;
-            case Tile.Liquid.Yellow:
-                _sr.color = _yellow;
-                break;
-            case Tile.Liquid.Blue:
-                _sr.color = _blue;
-                break;
-            case Tile.Liquid.Green:
-                _sr.color = _green;
-                break;
-            case Tile.Liquid.Purple:
-                _sr.color = _purple;
-                break;
-            case Tile.Liquid.Orange:
-                _sr.color = _orange;
-                break;
-            case Tile.Liquid.Brown:
-                _sr.color = _brown;
-                break;
-            default:
-                break;
-        }
-    }
+    //private void ColorEnemy()
+    //{
+    //    switch (_weakness)
+    //    {
+    //        case Tile.Liquid.White:
+    //            _sr.color = Color.white;
+    //            break;
+    //        case Tile.Liquid.Red:
+    //            _sr.color = _red;
+    //            break;
+    //        case Tile.Liquid.Yellow:
+    //            _sr.color = _yellow;
+    //            break;
+    //        case Tile.Liquid.Blue:
+    //            _sr.color = _blue;
+    //            break;
+    //        case Tile.Liquid.Green:
+    //            _sr.color = _green;
+    //            break;
+    //        case Tile.Liquid.Purple:
+    //            _sr.color = _purple;
+    //            break;
+    //        case Tile.Liquid.Orange:
+    //            _sr.color = _orange;
+    //            break;
+    //        case Tile.Liquid.Brown:
+    //            _sr.color = _brown;
+    //            break;
+    //        default:
+    //            break;
+    //    }
+    //}
 
     private void Move()
     {
