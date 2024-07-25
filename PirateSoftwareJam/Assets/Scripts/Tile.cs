@@ -17,7 +17,7 @@ public class Tile : MonoBehaviour
         _grid = grid;
         _gridPos = gridPos;
 
-        transform.localScale = _grid.GetGridSize();
+        transform.localScale = _grid.GetGridCellSize();
     }
     #endregion
 }

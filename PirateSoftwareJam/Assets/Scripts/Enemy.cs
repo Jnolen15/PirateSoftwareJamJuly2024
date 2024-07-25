@@ -42,7 +42,7 @@ public class Enemy : MonoBehaviour
         _grid = grid;
         _gridPos = gridPos;
 
-        transform.localScale = _grid.GetGridSize() * 0.9f;
+        transform.localScale = _grid.GetGridCellSize() * 0.9f;
 
         // Assign weakness
         int rand = Random.Range(1, 4);

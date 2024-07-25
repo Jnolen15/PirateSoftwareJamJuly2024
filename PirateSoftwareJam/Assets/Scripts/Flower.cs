@@ -59,7 +59,7 @@ public class Flower : MonoBehaviour
         _grid = grid;
         _gridPos = gridPos;
 
-        transform.localScale = _grid.GetGridSize();
+        transform.localScale = _grid.GetGridCellSize();
 
         _energy = nrg;
 
@@ -100,17 +100,10 @@ public class Flower : MonoBehaviour
 
     private void GameTick()
     {
-        //if(_energy == Energy.Brown)
-        //{
-        //    if(_brownWiltTime >= 1)
-        //    {
-        //        _brownWiltTime = 0;
-        //        _energy = Energy.White;
-        //        ColorFlower();
-        //    }
-        //    else
-        //        _brownWiltTime++;
-        //}
+        float gridSizeY = _grid.GetGridScaleY();
+
+        if (_gridPos.y > (gridSizeY - gridSizeY/2))
+            _grid.ShowGameEnd();
     }
 
     public void Paint(Energy nrg)

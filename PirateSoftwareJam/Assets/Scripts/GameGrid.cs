@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using TMPro;
 
 public class GameGrid : MonoBehaviour
 {
@@ -34,9 +35,19 @@ public class GameGrid : MonoBehaviour
 
     [SerializeField] private float _curGameTick;
     [SerializeField] private bool _inGameTick;
+
+    [SerializeField] private int _score;
     [SerializeField] private int _purpleScore;
     [SerializeField] private int _greenScore;
     [SerializeField] private int _orangeScore;
+
+    [SerializeField] private TextMeshProUGUI _totalScore;
+    [SerializeField] private TextMeshProUGUI _greenBurst;
+    [SerializeField] private TextMeshProUGUI _orangeBurst;
+    [SerializeField] private TextMeshProUGUI _purpleBurst;
+    [SerializeField] private GameObject _gameOver;
+    [SerializeField] private TextMeshProUGUI _gameOverText;
+    private bool _gameIsOver;
 
     [SerializeField] private GameObject _checker;
 
@@ -148,6 +159,29 @@ public class GameGrid : MonoBehaviour
         catalyst.Setup(tilePos, this, energy);
 
         return catalyst;
+    }
+    #endregion
+
+    //============== UI ==============
+    #region UI
+    public void ShowGameEnd()
+    {
+        if (_gameIsOver)
+            return;
+
+        _gameIsOver = true;
+        _gameOver.SetActive(true);
+        _gameOverText.text = "Final Score: " + _score;
+    }
+
+    private void UpdateScoreUI()
+    {
+        _score = _greenScore + _orangeScore + _purpleScore;
+
+        _totalScore.text = "Score: " + _score;
+        _greenBurst.text = "Green Burst: " + _greenScore;
+        _orangeBurst.text = "Orange Burst: " + _orangeScore;
+        _purpleBurst.text = "Purple Burst: " + _purpleScore;
     }
     #endregion
 
@@ -302,6 +336,8 @@ public class GameGrid : MonoBehaviour
                 Debug.Log("Flower can not be scored! not found in dictionary");
             }
         }
+
+        UpdateScoreUI();
     }
 
     public void MakeFlower(Vector3 bulletPos, Flower.Energy Catalyst)
@@ -408,7 +444,12 @@ public class GameGrid : MonoBehaviour
 
     //============== Helpers ==============
     #region Helpers
-    public Vector3 GetGridSize()
+    public int GetGridScaleY()
+    {
+        return _gridSizeY;
+    }
+
+    public Vector3 GetGridCellSize()
     {
         return _gameGrid.cellSize;
     }
