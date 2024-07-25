@@ -29,6 +29,7 @@ public class GameGrid : MonoBehaviour
     [SerializeField] private int _gridSizeY;
     [SerializeField] private int _minComboSize;
     [SerializeField] private int _newRowInterval;
+    [SerializeField] private int _newRowSize;
     private int _newRowCD;
 
     private Dictionary<Vector2Int, FlowerEntry> _flowerDict = new();
@@ -424,7 +425,7 @@ public class GameGrid : MonoBehaviour
         _flowerDict.Clear();
         foreach (FlowerEntry item in dictEntries)
         {
-            Vector2Int newPos = new Vector2Int(item.GridPos.x, item.GridPos.y + 2);
+            Vector2Int newPos = new Vector2Int(item.GridPos.x, item.GridPos.y + _newRowSize);
             item.GridPos = newPos;
             item.Flower.transform.position = _gameGrid.GetCellCenterWorld(new Vector3Int(newPos.x, newPos.y, 0));
             item.Flower.SetGridPos(item.GridPos);
@@ -434,7 +435,7 @@ public class GameGrid : MonoBehaviour
         // Spawn X new rows
         for (int x = 0; x <= _gridSizeX; x++)
         {
-            for (int y = 0; y < 2; y++)
+            for (int y = 0; y < _newRowSize; y++)
             {
                 MakeNewFlower(x - _gridSizeX / 2, y - _gridSizeY / 2);
             }

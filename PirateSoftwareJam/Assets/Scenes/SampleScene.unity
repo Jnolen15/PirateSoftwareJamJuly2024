@@ -770,10 +770,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _gameGrid: {fileID: 1447121815}
+  _backupPotionSR: {fileID: 2029843573}
+  _reticleSR: {fileID: 65264009}
   _bullet: {fileID: 4711458228561074075, guid: e44307740708cc44f9bf9c2b24170217, type: 3}
   _bulletSpeed: 15
-  _backupPotionSR: {fileID: 2029843573}
-  _gridPos: {x: 0, y: 0, z: 0}
   _catalystCD: 0
   _orange: {r: 1, g: 0.4862745, b: 0, a: 1}
   _purple: {r: 0.67058825, g: 0, b: 1, a: 1}
@@ -1753,7 +1753,8 @@ MonoBehaviour:
   _gridSizeX: 10
   _gridSizeY: 10
   _minComboSize: 5
-  _newRowInterval: 12
+  _newRowInterval: 10
+  _newRowSize: 1
   _curGameTick: 0
   _inGameTick: 0
   _score: 0

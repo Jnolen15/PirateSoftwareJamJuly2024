@@ -8,32 +8,21 @@ public class Catalyst : MonoBehaviour
 {
     //============== Refrences / Variables ==============
     #region R/V
-    [SerializeField] private Flower.Energy _energy;
+    private GameGrid _grid;
+    private SpriteRenderer _sr;
 
     [SerializeField] private Color _orange;
     [SerializeField] private Color _purple;
     [SerializeField] private Color _green;
+    private Flower.Energy _energy;
+    private Vector2Int _gridPos;
 
-    [SerializeField] private Vector2Int _gridPos;
-
-    [SerializeField] private GameGrid _grid;
-    [SerializeField] private SpriteRenderer _sr;
-
+    // For testing
     [SerializeField] private TextMeshProUGUI _coords;
     #endregion
 
     //============== Setup ==============
     #region Setup
-    private void Start()
-    {
-        GameGrid.GameTick += GameTick;
-    }
-
-    private void OnDestroy()
-    {
-        GameGrid.GameTick -= GameTick;
-    }
-
     public void Setup(Vector2Int gridPos, GameGrid grid, Flower.Energy nrg)
     {
         _sr = this.GetComponent<SpriteRenderer>();
@@ -53,11 +42,6 @@ public class Catalyst : MonoBehaviour
 
     //============== Function ==============
     #region Function
-    private void GameTick()
-    {
-        //Destroy(gameObject, 0.2f);
-    }
-
     public void Break()
     {
         Destroy(gameObject, 0.2f);

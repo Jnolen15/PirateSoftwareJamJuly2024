@@ -6,19 +6,24 @@ public class PlayerController : MonoBehaviour
 {
     //============== Refrences / Variables ==============
     #region R/V
+    [Header("Refrences")]
     [SerializeField] private Grid _gameGrid;
+    [SerializeField] private SpriteRenderer _backupPotionSR;
+    [SerializeField] private SpriteRenderer _reticleSR;
+    private SpriteRenderer _sr;
+
+    [Header("Variables")]
     [SerializeField] private GameObject _bullet;
     [SerializeField] private float _bulletSpeed;
-    [SerializeField] private SpriteRenderer _backupPotionSR;
-    [SerializeField] private Vector3Int _gridPos;
-    private SpriteRenderer _sr;
-    private Flower.Energy _nextEnergy;
-    private Flower.Energy _backupEnergy;
-    private bool _shotLoaded;
     [SerializeField] private int _catalystCD;
     [SerializeField] private Color _orange;
     [SerializeField] private Color _purple;
     [SerializeField] private Color _green;
+    private Vector3Int _gridPos;
+    private Flower.Energy _nextEnergy;
+    private Flower.Energy _backupEnergy;
+    private bool _shotLoaded;
+    private float _moveCD;
     #endregion
 
     //============== Setup ==============
@@ -39,7 +44,6 @@ public class PlayerController : MonoBehaviour
             _backupEnergy = Flower.Energy.Blue;
 
         _catalystCD = 3;
-
         GetNewLiquid();
         _shotLoaded = true;
 
@@ -59,48 +63,55 @@ public class PlayerController : MonoBehaviour
     #region Function
     void Update()
     {
-        //Vector3 dir = Input.mousePosition - Camera.main.WorldToScreenPoint(transform.position);
-        //var angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-        //transform.rotation = Quaternion.AngleAxis(angle - 90, Vector3.forward);
-
-        if (Input.GetMouseButtonDown(0) && _shotLoaded)
-        {
-            SpawnBullet(Vector3.down);
-        }
+        if ((Input.GetMouseButtonDown(0)  || Input.GetKeyDown(KeyCode.S)) && _shotLoaded)
+            SpawnBullet();
 
         if (Input.GetKeyDown(KeyCode.Space))
-        {
             SwapPotions();
+
+        // tap movement
+        if (Input.GetKeyDown(KeyCode.A))
+            Move(-1);
+        else if (Input.GetKeyDown(KeyCode.D))
+            Move(1);
+
+        // Hold movement
+        if (_moveCD > 0)
+        {
+            _moveCD -= Time.deltaTime;
+            return;
         }
 
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            _gridPos.x--;
-            transform.position = _gameGrid.GetCellCenterWorld(_gridPos);
-        }
-        else if (Input.GetKeyDown(KeyCode.D))
-        {
-            _gridPos.x++;
-            transform.position = _gameGrid.GetCellCenterWorld(_gridPos);
-        }
+        if (Input.GetKey(KeyCode.A))
+            Move(-1);
+        else if (Input.GetKey(KeyCode.D))
+            Move(1);
+    }
+
+    private void Move(int dir)
+    {
+        _gridPos.x += dir;
+        transform.position = _gameGrid.GetCellCenterWorld(_gridPos);
+        _moveCD = 0.2f;
     }
 
     private void GameTick()
     {
         _shotLoaded = true;
+        _reticleSR.color = Color.black;
     }
 
-    private void SpawnBullet(Vector3 dir)
+    private void SpawnBullet()
     {
         _shotLoaded = false;
+        _reticleSR.color = Color.gray;
 
         bool isCatalyst = false;
         if (_nextEnergy == Flower.Energy.Orange || _nextEnergy == Flower.Energy.Green || _nextEnergy == Flower.Energy.Purple)
             isCatalyst = true;
 
-        Vector3 bulletDir = dir.normalized;
         Bullet bullet = Instantiate(_bullet, transform.position, transform.rotation).GetComponent<Bullet>();
-        bullet.Setup(bulletDir, _bulletSpeed, _nextEnergy, isCatalyst);
+        bullet.Setup(Vector3.down, _bulletSpeed, _nextEnergy, isCatalyst);
 
         GetNewLiquid();
     }

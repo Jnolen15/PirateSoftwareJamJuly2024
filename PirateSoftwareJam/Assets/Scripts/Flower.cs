@@ -19,8 +19,8 @@ public class Flower : MonoBehaviour
         Orange,
         Brown
     }
-    [SerializeField] private Energy _energy;
 
+    [Header("Refrences")]
     [SerializeField] private Color _red;
     [SerializeField] private Color _yellow;
     [SerializeField] private Color _blue;
@@ -28,16 +28,14 @@ public class Flower : MonoBehaviour
     [SerializeField] private Color _purple;
     [SerializeField] private Color _orange;
     [SerializeField] private Color _brown;
+    [SerializeField] private Energy _energy;
+    private Vector2Int _gridPos;
+    private GameGrid _grid;
+    private SpriteRenderer _sr;
 
-    [SerializeField] private Vector2Int _gridPos;
-
-    [SerializeField] private GameGrid _grid;
-    [SerializeField] private SpriteRenderer _sr;
-
+    [Header("Testing")]
     [SerializeField] private TextMeshProUGUI _coords;
     [SerializeField] private TextMeshProUGUI _comboID;
-
-    private int _brownWiltTime;
     #endregion
 
     //============== Setup ==============
@@ -128,9 +126,6 @@ public class Flower : MonoBehaviour
                     _energy = Energy.Orange;
                 else if (nrg == Energy.Purple)
                     _energy = Energy.Purple;
-
-                //else
-                //    _energy = Energy.Brown;
                 break;
             case Energy.Yellow:
                 if (nrg == Energy.Red)
@@ -143,8 +138,6 @@ public class Flower : MonoBehaviour
                     _energy = Energy.Orange;
                 else if (nrg == Energy.Green)
                     _energy = Energy.Green;
-                //else
-                //    _energy = Energy.Brown;
                 break;
             case Energy.Blue:
                 if (nrg == Energy.Red)
@@ -157,20 +150,14 @@ public class Flower : MonoBehaviour
                     _energy = Energy.Purple;
                 else if (nrg == Energy.Green)
                     _energy = Energy.Green;
-                //else
-                //    _energy = Energy.Brown;
                 break;
             case Energy.Green:
-                //_energy = Energy.Brown;
                 break;
             case Energy.Purple:
-                //_energy = Energy.Brown;
                 break;
             case Energy.Orange:
-                //_energy = Energy.Brown;
                 break;
             case Energy.Brown:
-                //_energy = Energy.Brown;
                 break;
             default:
                 break;
