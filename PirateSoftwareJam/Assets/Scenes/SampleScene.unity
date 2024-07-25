@@ -932,6 +932,7 @@ MonoBehaviour:
   _gridSizeX: 10
   _gridSizeY: 10
   _minComboSize: 5
+  _newRowInterval: 12
   _curGameTick: 0
   _inGameTick: 0
   _purpleScore: 0

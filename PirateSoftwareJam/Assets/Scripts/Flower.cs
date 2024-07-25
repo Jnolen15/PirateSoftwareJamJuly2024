@@ -183,7 +183,7 @@ public class Flower : MonoBehaviour
                 break;
         }
         message += ($" made {_energy}");
-        Debug.Log(message);
+        //Debug.Log(message);
 
         if (prevNrg == _energy)
             return;
@@ -236,7 +236,7 @@ public class Flower : MonoBehaviour
                 break;
         }
 
-        _sr.DOColor(toColor, 0.3f);
+        _sr.DOColor(toColor, 0.6f);
     }
     #endregion
 }

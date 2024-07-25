@@ -55,8 +55,14 @@ public class Catalyst : MonoBehaviour
     #region Function
     private void GameTick()
     {
-        Destroy(gameObject, 0.5f);
+        //Destroy(gameObject, 0.2f);
     }
+
+    public void Break()
+    {
+        Destroy(gameObject, 0.2f);
+    }
+
     private void ColorCatalyst()
     {
         Color toColor = Color.white;
