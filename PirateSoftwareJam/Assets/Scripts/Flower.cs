@@ -52,7 +52,7 @@ public class Flower : MonoBehaviour
         GameGrid.GameTick -= GameTick;
     }
 
-    public void Setup(Vector2Int gridPos, GameGrid grid)
+    public void Setup(Vector2Int gridPos, GameGrid grid, Flower.Energy nrg)
     {
         _sr = this.GetComponent<SpriteRenderer>();
 
@@ -61,14 +61,7 @@ public class Flower : MonoBehaviour
 
         transform.localScale = _grid.GetGridSize();
 
-        // Assign color
-        int rand = Random.Range(1, 4);
-        if (rand == 1)
-            _energy = Flower.Energy.Red;
-        else if (rand == 2)
-            _energy = Flower.Energy.Yellow;
-        else if (rand == 3)
-            _energy = Flower.Energy.Blue;
+        _energy = nrg;
 
         ColorFlower();
 
@@ -83,6 +76,12 @@ public class Flower : MonoBehaviour
         return _gridPos;
     }
 
+    public void SetGridPos(Vector2Int gridPos)
+    {
+        _gridPos = gridPos;
+        _coords.text = $"({_gridPos.x},{_gridPos.y})";
+    }
+
     public Energy GetEnergy()
     {
         return _energy;
@@ -92,6 +91,11 @@ public class Flower : MonoBehaviour
     {
         _energy = nrg;
         ColorFlower();
+    }
+
+    public void SetComboID(int comboID)
+    {
+        _comboID.text = comboID.ToString();
     }
 
     private void GameTick()
@@ -107,11 +111,6 @@ public class Flower : MonoBehaviour
         //    else
         //        _brownWiltTime++;
         //}
-    }
-
-    public void SetComboID(int comboID)
-    {
-        _comboID.text = comboID.ToString();
     }
 
     public void Paint(Energy nrg)
@@ -132,8 +131,13 @@ public class Flower : MonoBehaviour
                     _energy = Energy.Orange;
                 else if (nrg == Energy.Blue)
                     _energy = Energy.Purple;
-                else
-                    _energy = Energy.Brown;
+                else if (nrg == Energy.Orange)
+                    _energy = Energy.Orange;
+                else if (nrg == Energy.Purple)
+                    _energy = Energy.Purple;
+
+                //else
+                //    _energy = Energy.Brown;
                 break;
             case Energy.Yellow:
                 if (nrg == Energy.Red)
@@ -142,8 +146,12 @@ public class Flower : MonoBehaviour
                     _energy = Energy.Yellow;
                 else if (nrg == Energy.Blue)
                     _energy = Energy.Green;
-                else
-                    _energy = Energy.Brown;
+                else if(nrg == Energy.Orange)
+                    _energy = Energy.Orange;
+                else if (nrg == Energy.Green)
+                    _energy = Energy.Green;
+                //else
+                //    _energy = Energy.Brown;
                 break;
             case Energy.Blue:
                 if (nrg == Energy.Red)
@@ -152,26 +160,30 @@ public class Flower : MonoBehaviour
                     _energy = Energy.Green;
                 else if (nrg == Energy.Blue)
                     _energy = Energy.Blue;
-                else
-                    _energy = Energy.Brown;
+                else if (nrg == Energy.Purple)
+                    _energy = Energy.Purple;
+                else if (nrg == Energy.Green)
+                    _energy = Energy.Green;
+                //else
+                //    _energy = Energy.Brown;
                 break;
             case Energy.Green:
-                _energy = Energy.Brown;
+                //_energy = Energy.Brown;
                 break;
             case Energy.Purple:
-                _energy = Energy.Brown;
+                //_energy = Energy.Brown;
                 break;
             case Energy.Orange:
-                _energy = Energy.Brown;
+                //_energy = Energy.Brown;
                 break;
             case Energy.Brown:
-                _energy = Energy.Brown;
+                //_energy = Energy.Brown;
                 break;
             default:
                 break;
         }
         message += ($" made {_energy}");
-        //Debug.Log(message);
+        Debug.Log(message);
 
         if (prevNrg == _energy)
             return;
@@ -224,7 +236,7 @@ public class Flower : MonoBehaviour
                 break;
         }
 
-        _sr.DOColor(toColor, 1f);
+        _sr.DOColor(toColor, 0.3f);
     }
     #endregion
 }

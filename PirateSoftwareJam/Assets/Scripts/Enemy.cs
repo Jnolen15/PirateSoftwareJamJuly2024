@@ -102,7 +102,7 @@ public class Enemy : MonoBehaviour
     {
         Debug.Log("Moving enemy, cur pos " + _gridPos);
 
-        _gridPos = GameGrid.Instance.MoveDown(_gridPos, transform);
+        //_gridPos = GameGrid.Instance.MoveDown(_gridPos, transform);
 
         Debug.Log("Moved to" + _gridPos);
 

@@ -22,6 +22,7 @@ public class GameGrid : MonoBehaviour
     [SerializeField] private GameObject _gridTile;
     [SerializeField] private GameObject _gridWall;
     [SerializeField] private GameObject _flower;
+    [SerializeField] private GameObject _catalyst;
     [SerializeField] private int _gridSizeX;
     [SerializeField] private int _gridSizeY;
     [SerializeField] private int _minComboSize;
@@ -33,6 +34,8 @@ public class GameGrid : MonoBehaviour
     [SerializeField] private int _purpleScore;
     [SerializeField] private int _greenScore;
     [SerializeField] private int _orangeScore;
+
+    [SerializeField] private GameObject _checker;
 
     public delegate void OnGameTick();
     public static event OnGameTick GameTick;
@@ -59,30 +62,36 @@ public class GameGrid : MonoBehaviour
     void Start()
     {
         // Tile floor
-        for (int x = 0; x < _gridSizeX; x++)
+        for (int x = 0; x <= _gridSizeX; x++)
         {
-            for (int y = 0; y < _gridSizeY; y++)
+            for (int y = 0; y <= _gridSizeY; y++)
             {
                 MakeNewTile(_gridTile, x - _gridSizeX / 2, y - _gridSizeY / 2);
             }
         }
 
-        // Right wall
-        for (int y = 0; y < _gridSizeY; y++)
-        {
-            MakeNewTile(_gridWall, _gridSizeX / 2, y - _gridSizeY / 2);
-        }
+        //// Right wall
+        //for (int y = 0; y < _gridSizeY; y++)
+        //{
+        //    MakeNewTile(_gridWall, _gridSizeX / 2, y - _gridSizeY / 2);
+        //}
 
-        // Left wall
-        for (int y = 0; y < _gridSizeY; y++)
+        //// Left wall
+        //for (int y = 0; y < _gridSizeY; y++)
+        //{
+        //    MakeNewTile(_gridWall, -1 - _gridSizeX / 2, y - _gridSizeY / 2);
+        //}
+
+        // bottom wall
+        for (int x = 0; x <= _gridSizeX; x++)
         {
-            MakeNewTile(_gridWall, -1 - _gridSizeX / 2, y - _gridSizeY / 2);
+            MakeNewTile(_gridWall, x - _gridSizeX / 2, _gridSizeX / 2 - _gridSizeX - 1);
         }
 
         // Flowers
-        for (int x = 0; x < _gridSizeX; x++)
+        for (int x = 0; x <= _gridSizeX; x++)
         {
-            for (int y = _gridSizeY / 2; y < _gridSizeY; y++)
+            for (int y = 0; y <= _gridSizeY / 2; y++)
             {
                 MakeNewFlower(x - _gridSizeX / 2, y - _gridSizeY / 2);
             }
@@ -97,14 +106,41 @@ public class GameGrid : MonoBehaviour
         tile.Setup(tilePos, this);
     }
 
-    private void MakeNewFlower(int x, int y)
+    private void MakeNewFlower(int x, int y, Flower.Energy energy = Flower.Energy.White)
     {
         Flower flower = Instantiate(_flower).GetComponent<Flower>();
         flower.transform.position = _gameGrid.GetCellCenterWorld(new Vector3Int(x, y, 0));
 
         Vector2Int tilePos = new Vector2Int(x, y);
         _flowerDict.Add(tilePos, new FlowerEntry(flower, tilePos, - 1));
-        flower.Setup(tilePos, this);
+
+        if (energy == Flower.Energy.White)
+        {
+            // Assign color
+            Flower.Energy nrg = Flower.Energy.White;
+            int rand = Random.Range(1, 4);
+            if (rand == 1)
+                nrg = Flower.Energy.Red;
+            else if (rand == 2)
+                nrg = Flower.Energy.Yellow;
+            else if (rand == 3)
+                nrg = Flower.Energy.Blue;
+
+            flower.Setup(tilePos, this, nrg);
+        }
+        else
+        {
+            flower.Setup(tilePos, this, energy);
+        }
+    }
+    
+    private void MakeNewCatalyst(int x, int y, Flower.Energy energy)
+    {
+        Catalyst catalyst = Instantiate(_catalyst).GetComponent<Catalyst>();
+        catalyst.transform.position = _gameGrid.GetCellCenterWorld(new Vector3Int(x, y, 0));
+
+        Vector2Int tilePos = new Vector2Int(x, y);
+        catalyst.Setup(tilePos, this, energy);
     }
     #endregion
 
@@ -129,9 +165,25 @@ public class GameGrid : MonoBehaviour
             entry.CheckedForCombo = false;
         }
 
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.4f);
 
         // Search and score combos
+        SearchForCombos();
+
+        yield return new WaitForSeconds(0.1f);
+
+        //StartCoroutine(MoveDown());
+        MoveDown();
+
+        yield return new WaitForSeconds(0.1f);
+
+        // Reset combo groups
+        foreach (FlowerEntry entry in _flowerDict.Values)
+        {
+            entry.ComboID = -1;
+            entry.CheckedForCombo = false;
+        }
+
         SearchForCombos();
 
         GameTick?.Invoke();
@@ -162,7 +214,7 @@ public class GameGrid : MonoBehaviour
                             flower.SetComboID(comboID);
                             CheckFlowerCombo(flowerList, flower, comboID);
 
-                            Debug.Log($"{flower.GetEnergy()} Flower combo list was {flowerList.Count}");
+                            //Debug.Log($"{flower.GetEnergy()} Flower combo list was {flowerList.Count}");
                             if (flowerList.Count >= _minComboSize && (flower.GetEnergy() == Flower.Energy.Green || flower.GetEnergy() == Flower.Energy.Orange || flower.GetEnergy() == Flower.Energy.Purple))
                                 ScoreCombo(flowerList);
                         }
@@ -227,6 +279,22 @@ public class GameGrid : MonoBehaviour
         }
     }
 
+    public void MakeFlower(Vector3 bulletPos, Flower.Energy Catalyst)
+    {
+        Vector3Int pos = _gameGrid.WorldToCell(bulletPos);
+        MakeNewFlower(pos.x, pos.y, Catalyst);
+    }
+
+    public void MakeCatalyst(Vector3 bulletPos, Flower.Energy Catalyst)
+    {
+        Vector3Int pos = _gameGrid.WorldToCell(bulletPos);
+        MakeNewCatalyst(pos.x, pos.y, Catalyst);
+        GameGrid.Instance.ColorFlower(new Vector2Int(pos.x + 1, pos.y), Catalyst);
+        GameGrid.Instance.ColorFlower(new Vector2Int(pos.x - 1, pos.y), Catalyst);
+        GameGrid.Instance.ColorFlower(new Vector2Int(pos.x, pos.y + 1), Catalyst);
+        GameGrid.Instance.ColorFlower(new Vector2Int(pos.x, pos.y - 1), Catalyst);
+    }
+
     public void ColorFlower(Vector2Int flowerPos, Flower.Energy Catalyst)
     {
         //Debug.Log($"{Catalyst} Potion burst at tile {flowerPos}");
@@ -241,14 +309,50 @@ public class GameGrid : MonoBehaviour
         _flowerDict[flowerPos].Flower.Paint(Catalyst);
     }
 
-    public Vector2Int MoveDown(Vector2Int curPos, Transform trans)
+    //private IEnumerator MoveDown()
+    private void MoveDown()
     {
-        Vector2Int newPos = new Vector2Int(curPos.x, curPos.y - 1);
+        // Cycle through from bottom up, dropping flowers if can
+        for (int x = 0; x <= _gridSizeX; x++)
+        {
+            bool dropped = false;
+            for (int y = _gridSizeY; y >= 1; y--)
+            {
 
-        //Vector3Int transCell = _gameGrid.WorldToCell(trans.position);
-        trans.position = _gameGrid.GetCellCenterWorld(new Vector3Int(newPos.x, newPos.y, 0));
+                Vector2Int checkingPos = new Vector2Int(x - _gridSizeX / 2, y - _gridSizeY / 2);
+                //yield return new WaitForSeconds(0.1f);
 
-        return newPos;
+                _checker.transform.position = _gameGrid.GetCellCenterWorld(new Vector3Int(checkingPos.x, checkingPos.y, 0));
+
+                Debug.Log($"Checking to drop at {checkingPos.x}, {checkingPos.y}");
+                if (_flowerDict.ContainsKey(checkingPos))
+                {
+                    FlowerEntry flowerEntry = _flowerDict[checkingPos];
+                    if (flowerEntry != null)
+                    {
+                        Vector2Int lowerPos = new Vector2Int(flowerEntry.GridPos.x, flowerEntry.GridPos.y - 1);
+
+                        // Move flower
+                        if (!GetIsFlowerAt(lowerPos))
+                        {
+                            dropped = true;
+
+                            Debug.Log($"Dropping flower {checkingPos.x}, {checkingPos.y} to {lowerPos.x}, {lowerPos.y}");
+
+                            flowerEntry.GridPos = lowerPos;
+                            _flowerDict.Remove(checkingPos);
+                            _flowerDict.Add(flowerEntry.GridPos, flowerEntry);
+
+                            flowerEntry.Flower.transform.position = _gameGrid.GetCellCenterWorld(new Vector3Int(lowerPos.x, lowerPos.y, 0));
+
+                            flowerEntry.Flower.SetGridPos(flowerEntry.GridPos);
+                        }
+                    }
+                }
+            }
+            if (dropped) // If something dropped, go over again
+                x--;
+        }
     }
     #endregion
 
@@ -257,6 +361,14 @@ public class GameGrid : MonoBehaviour
     public Vector3 GetGridSize()
     {
         return _gameGrid.cellSize;
+    }
+
+    public bool GetIsFlowerAt(Vector2Int pos)
+    {
+        if (_flowerDict.ContainsKey(pos))
+            return true;
+        else
+            return false;
     }
 
     public Flower.Energy GetFlowerEnergyAt(Vector2Int pos)

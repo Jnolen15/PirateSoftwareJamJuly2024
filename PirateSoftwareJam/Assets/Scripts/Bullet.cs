@@ -10,25 +10,29 @@ public class Bullet : MonoBehaviour
     private Rigidbody2D _rb;
     private SpriteRenderer _sr;
 
-    [SerializeField] private Flower.Energy _energy;
+    private Flower.Energy _energy;
+    private bool _isCatalyst;
+    private bool _hasHit;
     #endregion
 
     //============== Function ==============
     #region Function
-    public void Setup(Vector2 bulletDir, float _bulletSpeed, Flower.Energy nrg)
+    public void Setup(Vector2 bulletDir, float _bulletSpeed, Flower.Energy nrg, bool isCatalyst)
     {
         _rb = this.GetComponent<Rigidbody2D>();
         _sr = this.GetComponent<SpriteRenderer>();
 
         _rb.AddForce(bulletDir * _bulletSpeed, ForceMode2D.Impulse);
 
+        _isCatalyst = isCatalyst;
+
         _energy = nrg;
-        if (_energy == Flower.Energy.Red)
-            _sr.color = Color.red;
-        else if (_energy == Flower.Energy.Yellow)
-            _sr.color = Color.yellow;
-        else if (_energy == Flower.Energy.Blue)
-            _sr.color = Color.blue;
+        //if (_energy == Flower.Energy.Red)
+        //    _sr.color = Color.red;
+        //else if (_energy == Flower.Energy.Yellow)
+        //    _sr.color = Color.yellow;
+        //else if (_energy == Flower.Energy.Blue)
+        //    _sr.color = Color.blue;
 
         Destroy(gameObject, _liveTime);
     }
@@ -40,11 +44,20 @@ public class Bullet : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D col)
     {
-        if (!col.gameObject.CompareTag("Flower"))
+        if (!col.gameObject.CompareTag("Flower") && !col.gameObject.CompareTag("Wall"))
             return;
 
-        Vector2Int hitPos = col.gameObject.GetComponent<Flower>().GetGridPosition();
-        GameGrid.Instance.ColorFlower(hitPos, _energy);
+        if (_hasHit)
+            return;
+        else
+            _hasHit = true;
+
+        if (_isCatalyst)
+            GameGrid.Instance.MakeCatalyst(transform.position, _energy);
+        else
+        {
+            GameGrid.Instance.MakeFlower(transform.position, _energy);
+        }
 
         Destroy(gameObject);
     }
