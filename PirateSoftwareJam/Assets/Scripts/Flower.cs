@@ -36,6 +36,7 @@ public class Flower : MonoBehaviour
     [Header("Testing")]
     [SerializeField] private TextMeshProUGUI _coords;
     [SerializeField] private TextMeshProUGUI _comboID;
+    [SerializeField] private TextMeshProUGUI _points;
     #endregion
 
     //============== Setup ==============
@@ -217,6 +218,15 @@ public class Flower : MonoBehaviour
         }
 
         _sr.DOColor(toColor, 0.6f);
+    }
+
+    public void Score(float value)
+    {
+        _coords.gameObject.SetActive(false);
+        _comboID.gameObject.SetActive(false);
+        _points.gameObject.SetActive(true);
+        _points.text = value.ToString();
+        Destroy(gameObject, 0.5f);
     }
     #endregion
 }

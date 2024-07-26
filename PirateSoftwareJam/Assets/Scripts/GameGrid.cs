@@ -26,6 +26,7 @@ public class GameGrid : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _greenBurst;
     [SerializeField] private TextMeshProUGUI _orangeBurst;
     [SerializeField] private TextMeshProUGUI _purpleBurst;
+    [SerializeField] private TextMeshProUGUI _roundNum;
     [SerializeField] private GameObject _gameOver;
     [SerializeField] private TextMeshProUGUI _gameOverText;
 
@@ -39,17 +40,23 @@ public class GameGrid : MonoBehaviour
     [SerializeField] private int _gridSizeX;
     [SerializeField] private int _gridSizeY;
     [SerializeField] private int _minComboSize;
-    [SerializeField] private int _newRowInterval;
     [SerializeField] private int _newRowSize;
+    [SerializeField] private List<Vector2Int> _newRowInterval;
 
     private Dictionary<Vector2Int, FlowerEntry> _flowerDict = new();
     private bool _inGameTick;
+    private int _round;
     private int _newRowCD;
-    private int _score;
-    private int _purpleScore;
-    private int _greenScore;
-    private int _orangeScore;
+    private float _score;
+    private float _purpleScore;
+    private float _greenScore;
+    private float _orangeScore;
     private bool _gameIsOver;
+    private bool _comboScored;
+
+    private WaitForSeconds _colorPause;
+    private WaitForSeconds _scorePause;
+    private WaitForSeconds _dropPause;
 
     public delegate void OnGameTick();
     public static event OnGameTick GameTick;
@@ -75,7 +82,11 @@ public class GameGrid : MonoBehaviour
     #region Setup
     void Start()
     {
-        _newRowCD = _newRowInterval;
+        _colorPause = new WaitForSeconds(0.8f);
+        _scorePause = new WaitForSeconds(0.05f);
+        _dropPause = new WaitForSeconds(0.5f);
+
+        _newRowCD = _newRowInterval[0].y;
 
         // Tile floor
         for (int x = 0; x <= _gridSizeX; x++)
@@ -187,6 +198,7 @@ public class GameGrid : MonoBehaviour
             return;
 
         StartCoroutine(GameTickCoroutine());
+        IncreaseDifficulty();
     }
 
     private IEnumerator GameTickCoroutine()
@@ -195,26 +207,25 @@ public class GameGrid : MonoBehaviour
 
         ResetComboGroups();
 
-        yield return new WaitForSeconds(0.8f); // Wait for color
+        yield return _colorPause; // Wait for color
 
         // Search and score combos
-        bool comboScored = SearchForCombos();
-        while (comboScored)
+        yield return StartCoroutine(SearchForCombos());
+        while (_comboScored)
         {
+            yield return _dropPause;
             Debug.Log("Combo scored, dropping and checking");
             MoveDown();
 
-            yield return new WaitForSeconds(0.1f);
-
             ResetComboGroups();
 
-            comboScored = SearchForCombos();
+            yield return StartCoroutine(SearchForCombos());
         }
         
         // Make new rows
         if (_newRowCD <= 0)
         {
-            _newRowCD = _newRowInterval;
+            _newRowCD = GetNewRowCDBasedOnDifficulty();
             MakeNewRows();
         }
         else
@@ -249,6 +260,23 @@ public class GameGrid : MonoBehaviour
                 MakeNewFlower(x - _gridSizeX / 2, y - _gridSizeY / 2);
             }
         }
+    }
+
+    private void IncreaseDifficulty()
+    {
+        _round++;
+        _roundNum.text = _round.ToString();
+    }
+
+    private int GetNewRowCDBasedOnDifficulty()
+    {
+        int newRowSize = _newRowInterval[0].y;
+        foreach (Vector2Int item in _newRowInterval)
+        {
+            if (_round >= item.x)
+                newRowSize = item.y;
+        }
+        return newRowSize;
     }
     #endregion
 
@@ -285,9 +313,9 @@ public class GameGrid : MonoBehaviour
 
     //============== Grid ==============
     #region Grid
-    private bool SearchForCombos()
+    private IEnumerator SearchForCombos()
     {
-        bool comboScored = false;
+        _comboScored = false;
         for (int x = 0; x < _gridSizeX; x++)
         {
             for (int y = 0; y < _gridSizeY; y++)
@@ -311,14 +339,13 @@ public class GameGrid : MonoBehaviour
 
                         if (flowerList.Count >= _minComboSize && (flower.GetEnergy() == Flower.Energy.Green || flower.GetEnergy() == Flower.Energy.Orange || flower.GetEnergy() == Flower.Energy.Purple))
                         {
-                            ScoreCombo(flowerList);
-                            comboScored = true;
+                            _comboScored = true;
+                            yield return ScoreCombo(flowerList);
                         }
                     }
                 }
             }
         }
-        return comboScored;
     }
 
     private void CheckFlowerCombo(List<FlowerEntry> flowerList, Flower prevFlower, int comboID)
@@ -350,26 +377,31 @@ public class GameGrid : MonoBehaviour
         }
     }
 
-    private void ScoreCombo(List<FlowerEntry> flowerList)
+    private IEnumerator ScoreCombo(List<FlowerEntry> flowerList)
     {
+        int count = 1;
         foreach (FlowerEntry fe in flowerList)
         {
             if (_flowerDict.ContainsKey(fe.GridPos))
             {
+                float value = 10 * (1 + (count * 0.1f));
+
                 if (fe.Flower.GetEnergy() == Flower.Energy.Green)
-                    _greenScore++;
+                    _greenScore += value;
                 else if (fe.Flower.GetEnergy() == Flower.Energy.Purple)
-                    _purpleScore++;
+                    _purpleScore += value;
                 else if (fe.Flower.GetEnergy() == Flower.Energy.Orange)
-                    _orangeScore++;
+                    _orangeScore += value;
 
                 _flowerDict.Remove(fe.GridPos);
-                Destroy(fe.Flower.gameObject);
+                fe.Flower.Score(value);
+
+                count++;
+
+                yield return _scorePause;
             }
             else
-            {
                 Debug.Log("Flower can not be scored! not found in dictionary");
-            }
         }
 
         UpdateScoreUI();
