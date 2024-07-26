@@ -97,13 +97,13 @@ public class GameGrid : MonoBehaviour
             }
         }
 
-        //// Right wall
-        //for (int y = 0; y < _gridSizeY; y++)
-        //    MakeNewTile(_gridWall, _gridSizeX / 2, y - _gridSizeY / 2);
+        // Right wall
+        for (int y = 0; y < _gridSizeY; y++)
+            MakeNewTile(_gridWall, 1 + _gridSizeX / 2, y - _gridSizeY / 2);
 
-        //// Left wall
-        //for (int y = 0; y < _gridSizeY; y++)
-        //    MakeNewTile(_gridWall, -1 - _gridSizeX / 2, y - _gridSizeY / 2);
+        // Left wall
+        for (int y = 0; y < _gridSizeY; y++)
+            MakeNewTile(_gridWall, -1 - _gridSizeX / 2, y - _gridSizeY / 2);
 
         // bottom wall
         for (int x = 0; x <= _gridSizeX; x++)

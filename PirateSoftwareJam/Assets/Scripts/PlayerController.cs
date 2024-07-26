@@ -8,9 +8,9 @@ public class PlayerController : MonoBehaviour
     #region R/V
     [Header("Refrences")]
     [SerializeField] private Grid _gameGrid;
+    [SerializeField] private SpriteRenderer _mainPotionSR;
     [SerializeField] private SpriteRenderer _backupPotionSR;
     [SerializeField] private SpriteRenderer _reticleSR;
-    private SpriteRenderer _sr;
 
     [Header("Variables")]
     [SerializeField] private GameObject _bullet;
@@ -31,8 +31,6 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         GameGrid.GameTick += GameTick;
-
-        _sr = this.GetComponent<SpriteRenderer>();
 
         // Pick an initial backup color
         int rand = Random.Range(1, 4);
@@ -122,7 +120,7 @@ public class PlayerController : MonoBehaviour
         _nextEnergy = _backupEnergy;
         _backupEnergy = temp;
 
-        ColorSprite(_nextEnergy, _sr);
+        ColorSprite(_nextEnergy, _mainPotionSR);
         ColorSprite(_backupEnergy, _backupPotionSR);
     }
 
@@ -155,7 +153,7 @@ public class PlayerController : MonoBehaviour
                 _backupEnergy = Flower.Energy.Purple;
         }
 
-        ColorSprite(_nextEnergy, _sr);
+        ColorSprite(_nextEnergy, _mainPotionSR);
         ColorSprite(_backupEnergy, _backupPotionSR);
     }
 
