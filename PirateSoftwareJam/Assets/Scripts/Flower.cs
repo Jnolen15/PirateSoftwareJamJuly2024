@@ -21,13 +21,20 @@ public class Flower : MonoBehaviour
     }
 
     [Header("Refrences")]
+    [SerializeField] private SpriteRenderer _symbol;
+    [SerializeField] private SpriteRenderer _swirl;
     [SerializeField] private Color _red;
+    [SerializeField] private Sprite _symbolRed;
     [SerializeField] private Color _yellow;
+    [SerializeField] private Sprite _symbolYellow;
     [SerializeField] private Color _blue;
+    [SerializeField] private Sprite _symbolBlue;
     [SerializeField] private Color _green;
+    [SerializeField] private Sprite _symbolGreen;
     [SerializeField] private Color _purple;
+    [SerializeField] private Sprite _symbolPurple;
     [SerializeField] private Color _orange;
-    [SerializeField] private Color _brown;
+    [SerializeField] private Sprite _symbolOrange;
     [SerializeField] private Energy _energy;
     private Vector2Int _gridPos;
     private GameGrid _grid;
@@ -49,6 +56,9 @@ public class Flower : MonoBehaviour
     private void OnDestroy()
     {
         GameGrid.GameTick -= GameTick;
+
+        _swirl.transform.DOKill();
+        _sr.DOKill();
     }
 
     public void Setup(Vector2Int gridPos, GameGrid grid, Flower.Energy nrg)
@@ -194,30 +204,39 @@ public class Flower : MonoBehaviour
                 break;
             case Energy.Red:
                 toColor = _red;
+                _symbol.sprite = _symbolRed;
                 break;
             case Energy.Yellow:
                 toColor = _yellow;
+                _symbol.sprite = _symbolYellow;
                 break;
             case Energy.Blue:
                 toColor = _blue;
+                _symbol.sprite = _symbolBlue;
                 break;
             case Energy.Green:
                 toColor = _green;
+                _symbol.sprite = _symbolGreen;
                 break;
             case Energy.Purple:
                 toColor = _purple;
+                _symbol.sprite = _symbolPurple;
                 break;
             case Energy.Orange:
                 toColor = _orange;
+                _symbol.sprite = _symbolOrange;
                 break;
             case Energy.Brown:
-                toColor = _brown;
                 break;
             default:
                 break;
         }
 
-        _sr.DOColor(toColor, 0.6f);
+        _swirl.transform.rotation = Quaternion.Euler(0, 0, 0);
+        _swirl.gameObject.SetActive(true);
+        _swirl.color = toColor;
+        _swirl.transform.DORotateQuaternion(Quaternion.Euler(0, 0, -180), 0.9f).OnComplete(() => { _swirl.gameObject.SetActive(false); });
+        _sr.DOColor(toColor, 0.9f).SetEase(Ease.InSine);
     }
 
     public void Score(float value)
@@ -226,7 +245,7 @@ public class Flower : MonoBehaviour
         _comboID.gameObject.SetActive(false);
         _points.gameObject.SetActive(true);
         _points.text = value.ToString();
-        Destroy(gameObject, 0.5f);
+        Destroy(gameObject, 0.6f);
     }
     #endregion
 }

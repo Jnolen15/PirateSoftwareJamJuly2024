@@ -82,9 +82,9 @@ public class GameGrid : MonoBehaviour
     #region Setup
     void Start()
     {
-        _colorPause = new WaitForSeconds(0.8f);
+        _colorPause = new WaitForSeconds(1f);
         _scorePause = new WaitForSeconds(0.05f);
-        _dropPause = new WaitForSeconds(0.5f);
+        _dropPause = new WaitForSeconds(0.6f);
 
         _newRowCD = _newRowInterval[0].y;
 
