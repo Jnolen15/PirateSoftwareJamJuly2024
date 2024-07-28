@@ -256,7 +256,7 @@ public class GameGrid : MonoBehaviour
         {
             Vector2Int newPos = new Vector2Int(item.GridPos.x, item.GridPos.y + _newRowSize);
             item.GridPos = newPos;
-            item.Flower.transform.position = _gameGrid.GetCellCenterWorld(new Vector3Int(newPos.x, newPos.y, 0));
+            item.Flower.MoveTo(_gameGrid.GetCellCenterWorld(new Vector3Int(newPos.x, newPos.y, 0)), false);
             item.Flower.SetGridPos(item.GridPos);
             _flowerDict.Add(newPos, item);
         }
@@ -469,7 +469,7 @@ public class GameGrid : MonoBehaviour
                         flowerEntry.GridPos = lowerPos;
                         _flowerDict.Remove(checkingPos);
                         _flowerDict.Add(flowerEntry.GridPos, flowerEntry);
-                        flowerEntry.Flower.transform.position = _gameGrid.GetCellCenterWorld(new Vector3Int(lowerPos.x, lowerPos.y, 0));
+                        flowerEntry.Flower.MoveTo(_gameGrid.GetCellCenterWorld(new Vector3Int(lowerPos.x, lowerPos.y, 0)), true);
                         flowerEntry.Flower.SetGridPos(flowerEntry.GridPos);
                     }
                 }

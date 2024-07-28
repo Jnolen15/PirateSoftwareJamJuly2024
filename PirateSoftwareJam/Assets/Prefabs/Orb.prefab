@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 859923000541888967}
   - component: {fileID: 6589887758300533503}
   - component: {fileID: 3230499541194409107}
-  m_Layer: 5
+  m_Layer: 7
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -115,7 +115,7 @@ GameObject:
   m_Component:
   - component: {fileID: 906424275285662953}
   - component: {fileID: 2027255021489499663}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Swirl
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -202,7 +202,7 @@ GameObject:
   - component: {fileID: 6289798058057745447}
   - component: {fileID: 3333892645433771712}
   - component: {fileID: 5466723263158740780}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Orb
   m_TagString: Flower
   m_Icon: {fileID: 0}
@@ -380,7 +380,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4942360308613754996}
   - component: {fileID: 5759019437322846319}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Symbol
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -465,7 +465,7 @@ GameObject:
   - component: {fileID: 8561137197825431226}
   - component: {fileID: 713672104733621007}
   - component: {fileID: 910967232209375671}
-  m_Layer: 5
+  m_Layer: 7
   m_Name: GridSpace
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -599,7 +599,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1522885730517340314}
   - component: {fileID: 22187178416416192}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Bubbles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -684,7 +684,7 @@ GameObject:
   - component: {fileID: 5932132815927370012}
   - component: {fileID: 5610982025976727582}
   - component: {fileID: 7508370216866860021}
-  m_Layer: 5
+  m_Layer: 7
   m_Name: ID
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -819,7 +819,7 @@ GameObject:
   - component: {fileID: 2563204072848131249}
   - component: {fileID: 3198294815854091962}
   - component: {fileID: 2374415590227464645}
-  m_Layer: 5
+  m_Layer: 7
   m_Name: Score
   m_TagString: Untagged
   m_Icon: {fileID: 0}

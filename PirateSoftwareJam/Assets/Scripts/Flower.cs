@@ -113,6 +113,16 @@ public class Flower : MonoBehaviour
             _grid.ShowGameEnd();
     }
 
+    public void MoveTo(Vector3 newPos, bool animate)
+    {
+        transform.DOKill();
+
+        if (animate)
+            transform.DOMove(newPos, 0.1f).SetEase(Ease.InSine).OnComplete(() => { ShakeOrb(); });
+        else
+            transform.position = newPos;
+    }
+
     public void Paint(Energy nrg)
     {
         Energy prevNrg = _energy;
