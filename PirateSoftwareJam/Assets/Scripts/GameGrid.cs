@@ -453,6 +453,11 @@ public class GameGrid : MonoBehaviour
     {
         return _gridSizeY;
     }
+    
+    public int GetGridScaleX()
+    {
+        return _gridSizeX;
+    }
 
     public Vector3 GetGridCellSize()
     {

@@ -25,6 +25,8 @@ public class Bullet : MonoBehaviour
 
         _energy = nrg;
 
+        transform.localScale = GameGrid.Instance.GetGridCellSize();
+
         Destroy(gameObject, _liveTime);
     }
 

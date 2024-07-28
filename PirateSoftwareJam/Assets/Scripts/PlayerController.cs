@@ -8,22 +8,21 @@ public class PlayerController : MonoBehaviour
     #region R/V
     [Header("Refrences")]
     [SerializeField] private Grid _gameGrid;
-    [SerializeField] private SpriteRenderer _mainPotionSR;
-    [SerializeField] private SpriteRenderer _backupPotionSR;
+    [SerializeField] private VisualSetter _mainPotion;
+    [SerializeField] private VisualSetter _backupPotion;
     [SerializeField] private SpriteRenderer _reticleSR;
 
     [Header("Variables")]
     [SerializeField] private GameObject _bullet;
     [SerializeField] private float _bulletSpeed;
     [SerializeField] private int _catalystCD;
-    [SerializeField] private Color _orange;
-    [SerializeField] private Color _purple;
-    [SerializeField] private Color _green;
     private Vector3Int _gridPos;
     private Flower.Energy _nextEnergy;
     private Flower.Energy _backupEnergy;
     private bool _shotLoaded;
     private float _moveCD;
+    [SerializeField] int _xBoundRight;
+    [SerializeField] int _xBoundLeft;
     #endregion
 
     //============== Setup ==============
@@ -49,6 +48,9 @@ public class PlayerController : MonoBehaviour
         Vector3Int gridSpace = _gameGrid.WorldToCell(transform.position);
         transform.position = _gameGrid.GetCellCenterWorld(gridSpace);
         _gridPos = gridSpace;
+
+        _xBoundRight = (0 - GameGrid.Instance.GetGridScaleX() / 2);
+        _xBoundLeft = (0 + GameGrid.Instance.GetGridScaleX() / 2);
     }
 
     private void OnDestroy()
@@ -88,6 +90,12 @@ public class PlayerController : MonoBehaviour
 
     private void Move(int dir)
     {
+        Vector3Int cellPos = _gameGrid.WorldToCell(transform.position);
+        if (cellPos.x <= _xBoundRight && dir < 0)
+            return;
+        if (cellPos.x >= _xBoundLeft && dir > 0)
+            return;
+
         _gridPos.x += dir;
         transform.position = _gameGrid.GetCellCenterWorld(_gridPos);
         _moveCD = 0.2f;
@@ -111,6 +119,8 @@ public class PlayerController : MonoBehaviour
         Bullet bullet = Instantiate(_bullet, transform.position, transform.rotation).GetComponent<Bullet>();
         bullet.Setup(Vector3.down, _bulletSpeed, _nextEnergy, isCatalyst);
 
+        ColorSprites(bullet.GetComponent<VisualSetter>(), _nextEnergy);
+
         GetNewLiquid();
     }
 
@@ -120,8 +130,8 @@ public class PlayerController : MonoBehaviour
         _nextEnergy = _backupEnergy;
         _backupEnergy = temp;
 
-        ColorSprite(_nextEnergy, _mainPotionSR);
-        ColorSprite(_backupEnergy, _backupPotionSR);
+        ColorSprites(_mainPotion, _nextEnergy);
+        ColorSprites(_backupPotion, _backupEnergy);
     }
 
     private void GetNewLiquid()
@@ -143,7 +153,6 @@ public class PlayerController : MonoBehaviour
         else
         {
             _catalystCD = Random.Range(3, 6);
-
             int rand = Random.Range(1, 4);
             if (rand == 1)
                 _backupEnergy = Flower.Energy.Green;
@@ -153,24 +162,28 @@ public class PlayerController : MonoBehaviour
                 _backupEnergy = Flower.Energy.Purple;
         }
 
-        ColorSprite(_nextEnergy, _mainPotionSR);
-        ColorSprite(_backupEnergy, _backupPotionSR);
+        ColorSprites(_mainPotion, _nextEnergy);
+        ColorSprites(_backupPotion, _backupEnergy);
     }
 
-    private void ColorSprite(Flower.Energy nrg, SpriteRenderer sr)
+    private void ColorSprites(VisualSetter vs, Flower.Energy nrg)
     {
+        bool isCatalyst = false;
+
         if (nrg == Flower.Energy.Red)
-            sr.color = Color.red;
+            isCatalyst = false;
         else if (nrg == Flower.Energy.Yellow)
-            sr.color = Color.yellow;
+            isCatalyst = false;
         else if (nrg == Flower.Energy.Blue)
-            sr.color = Color.blue;
+            isCatalyst = false;
         else if (nrg == Flower.Energy.Green)
-            sr.color = _green;
+            isCatalyst = true;
         else if (nrg == Flower.Energy.Orange)
-            sr.color = _orange;
+            isCatalyst = true;
         else if (nrg == Flower.Energy.Purple)
-            sr.color = _purple;
+            isCatalyst = true;
+
+        vs.Setup(nrg, isCatalyst);
     }
     #endregion
 }

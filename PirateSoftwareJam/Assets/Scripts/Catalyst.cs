@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
 using DG.Tweening;
 
 public class Catalyst : MonoBehaviour
@@ -11,14 +10,15 @@ public class Catalyst : MonoBehaviour
     private GameGrid _grid;
     private SpriteRenderer _sr;
 
-    [SerializeField] private Color _orange;
-    [SerializeField] private Color _purple;
+    [SerializeField] private SpriteRenderer _symbol;
     [SerializeField] private Color _green;
+    [SerializeField] private Sprite _symbolGreen;
+    [SerializeField] private Color _purple;
+    [SerializeField] private Sprite _symbolPurple;
+    [SerializeField] private Color _orange;
+    [SerializeField] private Sprite _symbolOrange;
     private Flower.Energy _energy;
     private Vector2Int _gridPos;
-
-    // For testing
-    [SerializeField] private TextMeshProUGUI _coords;
     #endregion
 
     //============== Setup ==============
@@ -35,8 +35,6 @@ public class Catalyst : MonoBehaviour
         _energy = nrg;
 
         ColorCatalyst();
-
-        _coords.text = $"({_gridPos.x},{_gridPos.y})";
     }
     #endregion
 
@@ -44,7 +42,7 @@ public class Catalyst : MonoBehaviour
     #region Function
     public void Break()
     {
-        Destroy(gameObject, 0.2f);
+        Destroy(gameObject, 0.6f);
     }
 
     private void ColorCatalyst()
@@ -57,12 +55,15 @@ public class Catalyst : MonoBehaviour
                 break;
             case Flower.Energy.Orange:
                 toColor = _orange;
+                _symbol.sprite = _symbolOrange;
                 break;
             case Flower.Energy.Purple:
                 toColor = _purple;
+                _symbol.sprite = _symbolPurple;
                 break;
             case Flower.Energy.Green:
                 toColor = _green;
+                _symbol.sprite = _symbolGreen;
                 break;
             default:
                 break;
