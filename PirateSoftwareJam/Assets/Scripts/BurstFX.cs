@@ -20,7 +20,7 @@ public class BurstFX : MonoBehaviour
         _fx.Emit(Random.Range(3, 5));
 
         ParticleSystem.MainModule ma2 = _fx2.main;
-        color.a = 60;
+        color.a = 0.2f;
         ma2.startColor = color;
         _fx2.Emit(Random.Range(3, 5));
 
@@ -28,5 +28,10 @@ public class BurstFX : MonoBehaviour
         _canvasGroup.DOFade(0, _liveTime).SetEase(Ease.InSine);
 
         Destroy(gameObject, _liveTime);
+    }
+
+    private void OnDestroy()
+    {
+        _canvasGroup.DOKill();
     }
 }

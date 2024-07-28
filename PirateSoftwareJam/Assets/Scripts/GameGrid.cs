@@ -61,6 +61,9 @@ public class GameGrid : MonoBehaviour
     public delegate void OnGameTick();
     public static event OnGameTick GameTick;
 
+    public delegate void OnPointsScored(Color color);
+    public static event OnPointsScored PointsScored;
+
     public class FlowerEntry
     {
         public Flower Flower;
@@ -318,7 +321,7 @@ public class GameGrid : MonoBehaviour
     private IEnumerator SearchForCombos()
     {
         _comboScored = false;
-        for (int x = 0; x < _gridSizeX; x++)
+        for (int x = 0; x <= _gridSizeX; x++)
         {
             for (int y = 0; y < _gridSizeY; y++)
             {
@@ -380,6 +383,7 @@ public class GameGrid : MonoBehaviour
     private IEnumerator ScoreCombo(List<FlowerEntry> flowerList)
     {
         int count = 1;
+        Color coboColor = Color.white;
         foreach (FlowerEntry fe in flowerList)
         {
             if (_flowerDict.ContainsKey(fe.GridPos))
@@ -393,6 +397,7 @@ public class GameGrid : MonoBehaviour
                 else if (fe.Flower.GetEnergy() == Flower.Energy.Orange)
                     _orangeScore += value;
 
+                coboColor = fe.Flower.GetColor();
                 _flowerDict.Remove(fe.GridPos);
                 fe.Flower.Score(value);
 
@@ -404,6 +409,7 @@ public class GameGrid : MonoBehaviour
                 Debug.Log("Flower can not be scored! not found in dictionary");
         }
 
+        PointsScored?.Invoke(coboColor);
         UpdateScoreUI();
     }
 

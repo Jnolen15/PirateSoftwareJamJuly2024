@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.U2D;
+using DG.Tweening;
 
 /*
  * CODE CREDIT TO:
@@ -15,6 +16,8 @@ public class WaterShapeController : MonoBehaviour
     #region R/V
     [SerializeField] private GameObject _wavePointPref;
     private int _corsnersCount = 2;
+    [SerializeField] private SpriteRenderer _dummySprite;
+    [SerializeField] private SpriteShapeRenderer _spriteShapeRenderer;
     [SerializeField] private SpriteShapeController _spriteShapeController;
     [SerializeField] private int _wavesCount = 10;
     [SerializeField] private GameObject _wavePoints;
@@ -32,7 +35,14 @@ public class WaterShapeController : MonoBehaviour
     #region Setup
     private void Start()
     {
+        GameGrid.PointsScored += ColorWater;
+
         SetWaves();
+    }
+
+    private void OnDestroy()
+    {
+        GameGrid.PointsScored -= ColorWater;
     }
 
     private void SetWaves()
@@ -115,6 +125,11 @@ public class WaterShapeController : MonoBehaviour
 
     //============== Function ==============
     #region Function
+    private void Update()
+    {
+        _spriteShapeRenderer.color = _dummySprite.color;
+    }
+
     void FixedUpdate()
     {
         foreach (WaterSpring waterSpringComponent in _springs)
@@ -145,6 +160,12 @@ public class WaterShapeController : MonoBehaviour
                 _springs[i + 1].Velocity += right_deltas[i];
             }
         }
+    }
+
+    private void ColorWater(Color color)
+    {
+        color.a = 0.1f;
+        _dummySprite.DOColor(color, 2f);
     }
     #endregion
 }

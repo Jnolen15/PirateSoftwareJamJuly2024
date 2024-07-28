@@ -95,6 +95,11 @@ public class Flower : MonoBehaviour
         ColorFlower();
     }
 
+    public Color GetColor()
+    {
+        return PickColorOnEnergy();
+    }
+
     public void ShakeOrb()
     {
         transform.DOPunchPosition(new Vector3(0, 0.1f, 0), 0.2f, 20);
@@ -189,6 +194,17 @@ public class Flower : MonoBehaviour
 
     private void ColorFlower()
     {
+        Color toColor = PickColorOnEnergy();
+
+        _swirl.transform.rotation = Quaternion.Euler(0, 0, 0);
+        _swirl.gameObject.SetActive(true);
+        _swirl.color = toColor;
+        _swirl.transform.DORotateQuaternion(Quaternion.Euler(0, 0, -180), 0.9f).OnComplete(() => { _swirl.gameObject.SetActive(false); });
+        _sr.DOColor(toColor, 0.9f).SetEase(Ease.InSine);
+    }
+
+    private Color PickColorOnEnergy()
+    {
         Color toColor = Color.white;
         switch (_energy)
         {
@@ -225,11 +241,7 @@ public class Flower : MonoBehaviour
                 break;
         }
 
-        _swirl.transform.rotation = Quaternion.Euler(0, 0, 0);
-        _swirl.gameObject.SetActive(true);
-        _swirl.color = toColor;
-        _swirl.transform.DORotateQuaternion(Quaternion.Euler(0, 0, -180), 0.9f).OnComplete(() => { _swirl.gameObject.SetActive(false); });
-        _sr.DOColor(toColor, 0.9f).SetEase(Ease.InSine);
+        return toColor;
     }
 
     public void Score(float value)
