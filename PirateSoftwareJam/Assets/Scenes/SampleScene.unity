@@ -728,6 +728,8 @@ MonoBehaviour:
   _bullet: {fileID: 4711458228561074075, guid: e44307740708cc44f9bf9c2b24170217, type: 3}
   _bulletSpeed: 15
   _catalystCD: 0
+  _xBoundRight: 0
+  _xBoundLeft: 0
 --- !u!1 &645017169
 GameObject:
   m_ObjectHideFlags: 0

@@ -21,6 +21,7 @@ public class Flower : MonoBehaviour
     }
 
     [Header("Refrences")]
+    [SerializeField] private GameObject _burstFX;
     [SerializeField] private SpriteRenderer _symbol;
     [SerializeField] private SpriteRenderer _swirl;
     [SerializeField] private Color _red;
@@ -39,11 +40,6 @@ public class Flower : MonoBehaviour
     private Vector2Int _gridPos;
     private GameGrid _grid;
     private SpriteRenderer _sr;
-
-    [Header("Testing")]
-    [SerializeField] private TextMeshProUGUI _coords;
-    [SerializeField] private TextMeshProUGUI _comboID;
-    [SerializeField] private TextMeshProUGUI _points;
     #endregion
 
     //============== Setup ==============
@@ -73,8 +69,6 @@ public class Flower : MonoBehaviour
         _energy = nrg;
 
         ColorFlower();
-
-        _coords.text = $"({_gridPos.x},{_gridPos.y})";
     }
     #endregion
 
@@ -88,7 +82,6 @@ public class Flower : MonoBehaviour
     public void SetGridPos(Vector2Int gridPos)
     {
         _gridPos = gridPos;
-        _coords.text = $"({_gridPos.x},{_gridPos.y})";
     }
 
     public Energy GetEnergy()
@@ -102,9 +95,9 @@ public class Flower : MonoBehaviour
         ColorFlower();
     }
 
-    public void SetComboID(int comboID)
+    public void ShakeOrb()
     {
-        _comboID.text = comboID.ToString();
+        transform.DOPunchPosition(new Vector3(0, 0.1f, 0), 0.2f, 20);
     }
 
     private void GameTick()
@@ -241,11 +234,10 @@ public class Flower : MonoBehaviour
 
     public void Score(float value)
     {
-        _coords.gameObject.SetActive(false);
-        _comboID.gameObject.SetActive(false);
-        _points.gameObject.SetActive(true);
-        _points.text = value.ToString();
-        Destroy(gameObject, 0.6f);
+
+        BurstFX fx = Instantiate(_burstFX, transform.position, transform.rotation).GetComponent<BurstFX>();
+        fx.Setup((int)value, _sr.color);
+        Destroy(gameObject);
     }
     #endregion
 }

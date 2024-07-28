@@ -154,6 +154,8 @@ public class GameGrid : MonoBehaviour
         {
             flower.Setup(tilePos, this, energy);
         }
+
+        flower.ShakeOrb();
     }
     
     private Catalyst MakeNewCatalyst(int x, int y, Flower.Energy energy)
@@ -333,7 +335,6 @@ public class GameGrid : MonoBehaviour
                         _flowerDict[checkingPos].ComboID = comboID;
                         _flowerDict[checkingPos].CheckedForCombo = true;
                         Flower flower = _flowerDict[checkingPos].Flower;
-                        flower.SetComboID(comboID);
 
                         CheckFlowerCombo(flowerList, flower, comboID);
 
@@ -372,7 +373,6 @@ public class GameGrid : MonoBehaviour
             flowerList.Add(flowerEntry);
             flowerEntry.ComboID = comboID;
             flowerEntry.CheckedForCombo = true;
-            flowerEntry.Flower.SetComboID(comboID);
             CheckFlowerCombo(flowerList, flowerEntry.Flower, comboID);
         }
     }

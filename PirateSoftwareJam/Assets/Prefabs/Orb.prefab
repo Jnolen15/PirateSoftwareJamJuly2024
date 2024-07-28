@@ -354,6 +354,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bded73a8df1d5242b832a3a95ec34eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _burstFX: {fileID: 265449800048624962, guid: 358119f4c68cfbd4a94c916f1516ae7c, type: 3}
   _symbol: {fileID: 5759019437322846319}
   _swirl: {fileID: 2027255021489499663}
   _red: {r: 1, g: 0.07075471, b: 0.07075471, a: 1}
@@ -369,9 +370,8 @@ MonoBehaviour:
   _orange: {r: 1, g: 0.48275864, b: 0, a: 1}
   _symbolOrange: {fileID: 21300000, guid: 741567aac3593084e914a26abf680dde, type: 3}
   _energy: 0
-  _coords: {fileID: 910967232209375671}
-  _comboID: {fileID: 7508370216866860021}
-  _points: {fileID: 2374415590227464645}
+  _vibrato: 20
+  _elasticity: 0.1
 --- !u!1 &4045560214321134893
 GameObject:
   m_ObjectHideFlags: 0

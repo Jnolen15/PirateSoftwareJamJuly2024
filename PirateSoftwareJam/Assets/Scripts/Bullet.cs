@@ -50,6 +50,11 @@ public class Bullet : MonoBehaviour
         else
             GameGrid.Instance.MakeFlower(transform.position, _energy);
 
+        if (col.gameObject.CompareTag("Flower"))
+        {
+            col.gameObject.GetComponent<Flower>().ShakeOrb();
+        }
+
         Destroy(gameObject);
     }
     #endregion
