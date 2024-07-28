@@ -244,11 +244,15 @@ public class Flower : MonoBehaviour
         return toColor;
     }
 
-    public void Score(float value)
+    public void Glow()
     {
+        _symbol.DOColor(Color.white, 0.2f);
+    }
 
+    public void Score(int value)
+    {
         BurstFX fx = Instantiate(_burstFX, transform.position, transform.rotation).GetComponent<BurstFX>();
-        fx.Setup((int)value, _sr.color);
+        fx.Setup(value, _sr.color, new Vector2Int(3, 5));
         Destroy(gameObject);
     }
     #endregion

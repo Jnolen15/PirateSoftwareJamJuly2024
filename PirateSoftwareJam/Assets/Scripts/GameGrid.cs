@@ -29,6 +29,7 @@ public class GameGrid : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _roundNum;
     [SerializeField] private GameObject _gameOver;
     [SerializeField] private TextMeshProUGUI _gameOverText;
+    [SerializeField] private ComboFX _comboFX;
 
     [Header("Prefabs")]
     [SerializeField] private GameObject _gridTile;
@@ -42,6 +43,7 @@ public class GameGrid : MonoBehaviour
     [SerializeField] private int _minComboSize;
     [SerializeField] private int _newRowSize;
     [SerializeField] private List<Vector2Int> _newRowInterval;
+    [SerializeField] private List<Vector2Int> _scoreIntervals;
 
     private Dictionary<Vector2Int, FlowerEntry> _flowerDict = new();
     private bool _inGameTick;
@@ -53,6 +55,7 @@ public class GameGrid : MonoBehaviour
     private float _orangeScore;
     private bool _gameIsOver;
     private bool _comboScored;
+    private Vector3Int _lastCatalystPos;
 
     private WaitForSeconds _colorPause;
     private WaitForSeconds _scorePause;
@@ -86,7 +89,7 @@ public class GameGrid : MonoBehaviour
     void Start()
     {
         _colorPause = new WaitForSeconds(1f);
-        _scorePause = new WaitForSeconds(0.05f);
+        _scorePause = new WaitForSeconds(0.1f);
         _dropPause = new WaitForSeconds(0.6f);
 
         _newRowCD = _newRowInterval[0].y;
@@ -134,7 +137,7 @@ public class GameGrid : MonoBehaviour
 
     private void MakeNewFlower(int x, int y, Flower.Energy energy = Flower.Energy.White)
     {
-        Flower flower = Instantiate(_flower).GetComponent<Flower>();
+        Flower flower = Instantiate(_flower, transform).GetComponent<Flower>();
         flower.transform.position = _gameGrid.GetCellCenterWorld(new Vector3Int(x, y, 0));
         Vector2Int tilePos = new Vector2Int(x, y);
         _flowerDict.Add(tilePos, new FlowerEntry(flower, tilePos, - 1));
@@ -163,10 +166,11 @@ public class GameGrid : MonoBehaviour
     
     private Catalyst MakeNewCatalyst(int x, int y, Flower.Energy energy)
     {
-        Catalyst catalyst = Instantiate(_catalyst).GetComponent<Catalyst>();
+        Catalyst catalyst = Instantiate(_catalyst, transform).GetComponent<Catalyst>();
         catalyst.transform.position = _gameGrid.GetCellCenterWorld(new Vector3Int(x, y, 0));
         Vector2Int tilePos = new Vector2Int(x, y);
         catalyst.Setup(tilePos, this, energy);
+        _lastCatalystPos = new Vector3Int(x, y, 0);
 
         return catalyst;
     }
@@ -297,22 +301,27 @@ public class GameGrid : MonoBehaviour
     {
         Vector3Int pos = _gameGrid.WorldToCell(bulletPos);
         Catalyst catalyst = MakeNewCatalyst(pos.x, pos.y, catalystColor);
-        GameGrid.Instance.ColorFlower(new Vector2Int(pos.x + 1, pos.y), catalystColor);
-        GameGrid.Instance.ColorFlower(new Vector2Int(pos.x - 1, pos.y), catalystColor);
-        GameGrid.Instance.ColorFlower(new Vector2Int(pos.x, pos.y + 1), catalystColor);
-        GameGrid.Instance.ColorFlower(new Vector2Int(pos.x, pos.y - 1), catalystColor);
+
+        bool[] directions = new bool[4];
+        directions[0] = GameGrid.Instance.ColorFlower(new Vector2Int(pos.x + 1, pos.y), catalystColor);
+        directions[1] = GameGrid.Instance.ColorFlower(new Vector2Int(pos.x - 1, pos.y), catalystColor);
+        directions[2] = GameGrid.Instance.ColorFlower(new Vector2Int(pos.x, pos.y + 1), catalystColor);
+        directions[3] = GameGrid.Instance.ColorFlower(new Vector2Int(pos.x, pos.y - 1), catalystColor);
+
+        catalyst.ShowFX(directions);
         catalyst.Break();
     }
 
-    public void ColorFlower(Vector2Int flowerPos, Flower.Energy Catalyst)
+    public bool ColorFlower(Vector2Int flowerPos, Flower.Energy Catalyst)
     {
         if (!_flowerDict.ContainsKey(flowerPos))
         {
             Debug.Log($"Tile {flowerPos} not found!");
-            return;
+            return false;
         }
 
         _flowerDict[flowerPos].Flower.Paint(Catalyst);
+        return true;
     }
     #endregion
 
@@ -384,22 +393,29 @@ public class GameGrid : MonoBehaviour
     {
         int count = 1;
         Color coboColor = Color.white;
+
+        foreach (FlowerEntry fe in flowerList)
+            fe.Flower.Glow();
+
         foreach (FlowerEntry fe in flowerList)
         {
             if (_flowerDict.ContainsKey(fe.GridPos))
             {
-                float value = 10 * (1 + (count * 0.1f));
+                int pointsVal = GetPointsBasedComboSize(count);
 
                 if (fe.Flower.GetEnergy() == Flower.Energy.Green)
-                    _greenScore += value;
+                    _greenScore += pointsVal;
                 else if (fe.Flower.GetEnergy() == Flower.Energy.Purple)
-                    _purpleScore += value;
+                    _purpleScore += pointsVal;
                 else if (fe.Flower.GetEnergy() == Flower.Energy.Orange)
-                    _orangeScore += value;
+                    _orangeScore += pointsVal;
 
                 coboColor = fe.Flower.GetColor();
                 _flowerDict.Remove(fe.GridPos);
-                fe.Flower.Score(value);
+                fe.Flower.Score(pointsVal);
+
+                _comboFX.transform.position = _gameGrid.GetCellCenterWorld(_lastCatalystPos);
+                _comboFX.Setup(count, coboColor);
 
                 count++;
 
@@ -409,8 +425,20 @@ public class GameGrid : MonoBehaviour
                 Debug.Log("Flower can not be scored! not found in dictionary");
         }
 
+        _comboFX.Hide();
         PointsScored?.Invoke(coboColor);
         UpdateScoreUI();
+    }
+
+    private int GetPointsBasedComboSize(int index)
+    {
+        int pointsVal = _scoreIntervals[0].y;
+        foreach (Vector2Int item in _scoreIntervals)
+        {
+            if (index >= item.x)
+                pointsVal = item.y;
+        }
+        return pointsVal;
     }
 
     private void ResetComboGroups()

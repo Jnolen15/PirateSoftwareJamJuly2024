@@ -17,8 +17,11 @@ public class Catalyst : MonoBehaviour
     [SerializeField] private Sprite _symbolPurple;
     [SerializeField] private Color _orange;
     [SerializeField] private Sprite _symbolOrange;
+    [SerializeField] private GameObject _burstFX;
+    [SerializeField] private List<ParticleSystem> _shockFX;
     private Flower.Energy _energy;
     private Vector2Int _gridPos;
+    private Color _thisColor;
     #endregion
 
     //============== Setup ==============
@@ -45,6 +48,29 @@ public class Catalyst : MonoBehaviour
         Destroy(gameObject, 0.6f);
     }
 
+    private void OnDestroy()
+    {
+        BurstFX fx = Instantiate(_burstFX, transform.position, transform.rotation).GetComponent<BurstFX>();
+        fx.Setup(0, _thisColor, new Vector2Int(6, 12));
+    }
+
+    public void ShowFX(bool[] dir)
+    {
+        int index = 0;
+        foreach (ParticleSystem fx in _shockFX)
+        {
+            if (dir[index])
+            {
+                ParticleSystem.MainModule ma = fx.main;
+                _thisColor.a = 120;
+                ma.startColor = _thisColor;
+                fx.Play();
+            }
+
+            index++;
+        }
+    }
+
     private void ColorCatalyst()
     {
         Color toColor = Color.white;
@@ -69,7 +95,8 @@ public class Catalyst : MonoBehaviour
                 break;
         }
 
-        _sr.DOColor(toColor, 1f);
+        _thisColor = toColor;
+        _sr.DOColor(_thisColor, 1f);
     }
     #endregion
 }
