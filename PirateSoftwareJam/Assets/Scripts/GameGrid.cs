@@ -192,10 +192,10 @@ public class GameGrid : MonoBehaviour
     {
         _score = _greenScore + _orangeScore + _purpleScore;
 
-        _totalScore.text = "Score: " + _score;
-        _greenBurst.text = "Green Burst: " + _greenScore;
-        _orangeBurst.text = "Orange Burst: " + _orangeScore;
-        _purpleBurst.text = "Purple Burst: " + _purpleScore;
+        _totalScore.text = _score.ToString();
+        _greenBurst.text = _greenScore.ToString();
+        _orangeBurst.text = _orangeScore.ToString();
+        _purpleBurst.text = _purpleScore.ToString();
     }
     #endregion
 
