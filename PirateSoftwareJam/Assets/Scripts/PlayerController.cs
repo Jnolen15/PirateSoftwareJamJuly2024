@@ -11,6 +11,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private VisualSetter _mainPotion;
     [SerializeField] private VisualSetter _backupPotion;
     [SerializeField] private SpriteRenderer _reticleSR;
+    [SerializeField] private SoundPlayer _soundPlayer;
 
     [Header("Variables")]
     [SerializeField] private GameObject _bullet;
@@ -126,6 +127,8 @@ public class PlayerController : MonoBehaviour
 
     private void SwapPotions()
     {
+        _soundPlayer.PlayRandom(true);
+
         Flower.Energy temp = _nextEnergy;
         _nextEnergy = _backupEnergy;
         _backupEnergy = temp;

@@ -30,6 +30,7 @@ public class GameGrid : MonoBehaviour
     [SerializeField] private GameObject _gameOver;
     [SerializeField] private TextMeshProUGUI _gameOverText;
     [SerializeField] private ComboFX _comboFX;
+    private SoundPlayer _soundPlayer;
 
     [Header("Prefabs")]
     [SerializeField] private GameObject _gridTile;
@@ -88,6 +89,8 @@ public class GameGrid : MonoBehaviour
     #region Setup
     void Start()
     {
+        _soundPlayer = this.GetComponent<SoundPlayer>();
+
         _colorPause = new WaitForSeconds(1f);
         _scorePause = new WaitForSeconds(0.1f);
         _dropPause = new WaitForSeconds(0.6f);
@@ -122,9 +125,11 @@ public class GameGrid : MonoBehaviour
         {
             for (int y = 0; y <= _gridSizeY / 2; y++)
             {
-                MakeNewFlower(x - _gridSizeX / 2, y - _gridSizeY / 2);
+                MakeNewFlower(x - _gridSizeX / 2, y - _gridSizeY / 2, false);
             }
         }
+
+        _soundPlayer.PlayAtIndex(0, true);
     }
 
     private void MakeNewTile(GameObject obj, int x, int y)
@@ -135,7 +140,7 @@ public class GameGrid : MonoBehaviour
         tile.Setup(tilePos, this);
     }
 
-    private void MakeNewFlower(int x, int y, Flower.Energy energy = Flower.Energy.White)
+    private void MakeNewFlower(int x, int y, bool playSound, Flower.Energy energy = Flower.Energy.White)
     {
         Flower flower = Instantiate(_flower, transform).GetComponent<Flower>();
         flower.transform.position = _gameGrid.GetCellCenterWorld(new Vector3Int(x, y, 0));
@@ -154,11 +159,11 @@ public class GameGrid : MonoBehaviour
             else if (rand == 3)
                 nrg = Flower.Energy.Blue;
 
-            flower.Setup(tilePos, this, nrg);
+            flower.Setup(tilePos, this, nrg, playSound);
         }
         else
         {
-            flower.Setup(tilePos, this, energy);
+            flower.Setup(tilePos, this, energy, playSound);
         }
 
         flower.ShakeOrb();
@@ -230,7 +235,7 @@ public class GameGrid : MonoBehaviour
 
             yield return StartCoroutine(SearchForCombos());
         }
-        
+
         // Make new rows
         if (_newRowCD <= 0)
         {
@@ -266,9 +271,11 @@ public class GameGrid : MonoBehaviour
         {
             for (int y = 0; y < _newRowSize; y++)
             {
-                MakeNewFlower(x - _gridSizeX / 2, y - _gridSizeY / 2);
+                MakeNewFlower(x - _gridSizeX / 2, y - _gridSizeY / 2, false);
             }
         }
+
+        _soundPlayer.PlayAtIndex(0, true);
     }
 
     private void IncreaseDifficulty()
@@ -294,7 +301,7 @@ public class GameGrid : MonoBehaviour
     public void MakeFlower(Vector3 bulletPos, Flower.Energy Catalyst)
     {
         Vector3Int pos = _gameGrid.WorldToCell(bulletPos);
-        MakeNewFlower(pos.x, pos.y, Catalyst);
+        MakeNewFlower(pos.x, pos.y, true, Catalyst);
     }
 
     public void MakeCatalyst(Vector3 bulletPos, Flower.Energy catalystColor)
@@ -397,6 +404,8 @@ public class GameGrid : MonoBehaviour
         foreach (FlowerEntry fe in flowerList)
             fe.Flower.Glow();
 
+        _soundPlayer.SetPitch(0.4f);
+
         foreach (FlowerEntry fe in flowerList)
         {
             if (_flowerDict.ContainsKey(fe.GridPos))
@@ -417,6 +426,8 @@ public class GameGrid : MonoBehaviour
                 _comboFX.transform.position = _gameGrid.GetCellCenterWorld(_lastCatalystPos);
                 _comboFX.Setup(count, coboColor);
 
+                _soundPlayer.PlayMusicalScale(1, count);
+
                 count++;
 
                 yield return _scorePause;
@@ -425,6 +436,8 @@ public class GameGrid : MonoBehaviour
                 Debug.Log("Flower can not be scored! not found in dictionary");
         }
 
+        _soundPlayer.SetPitch(1);
+        _comboFX.EndCombo(count);
         _comboFX.Hide();
         PointsScored?.Invoke(coboColor);
         UpdateScoreUI();
@@ -453,6 +466,7 @@ public class GameGrid : MonoBehaviour
     private void MoveDown()
     {
         // Cycle through from bottom up, dropping flowers if can
+        bool atLeastOneDrop = false;
         for (int x = 0; x <= _gridSizeX; x++)
         {
             bool dropped = false;
@@ -475,9 +489,15 @@ public class GameGrid : MonoBehaviour
                 }
             }
 
-            if (dropped) // If something dropped, go over column again
+            if (dropped) // If something dropped, go over column again{
+            {
+                atLeastOneDrop = true;
                 x--;
+            }
         }
+
+        if(atLeastOneDrop)
+            _soundPlayer.PlayWithDelay(2, 0.1f, true);
     }
     #endregion
 

@@ -14,6 +14,7 @@ public class WaterSpring : MonoBehaviour
     //============== Refrences / Variables ==============
     #region R / V
     private int _waveIndex = 0;
+    private WaterShapeController _waterShapeConroller;
     private static SpriteShapeController _spriteShapeController = null;
     [System.NonSerialized] public float Velocity = 0;
     [System.NonSerialized] public float Height = 0f;
@@ -24,8 +25,10 @@ public class WaterSpring : MonoBehaviour
 
     //============== Setup ==============
     #region Setup
-    public void Setup(SpriteShapeController ssc)
+    public void Setup(WaterShapeController wsc, SpriteShapeController ssc)
     {
+        _waterShapeConroller = wsc;
+
         var index = transform.GetSiblingIndex();
         _waveIndex = index + 1;
         _spriteShapeController = ssc;
@@ -66,6 +69,8 @@ public class WaterSpring : MonoBehaviour
         if (other.gameObject.tag.Equals("Bullet"))
         {
             Velocity += _impact;
+
+            _waterShapeConroller.WaterHit();
         }
     }
     #endregion

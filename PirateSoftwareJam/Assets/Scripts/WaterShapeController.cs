@@ -14,9 +14,9 @@ public class WaterShapeController : MonoBehaviour
 {
     //============== Refrences / Variables ==============
     #region R/V
+    [Header("Water Sim")]
     [SerializeField] private GameObject _wavePointPref;
     private int _corsnersCount = 2;
-    [SerializeField] private SpriteRenderer _dummySprite;
     [SerializeField] private SpriteShapeRenderer _spriteShapeRenderer;
     [SerializeField] private SpriteShapeController _spriteShapeController;
     [SerializeField] private int _wavesCount = 10;
@@ -29,6 +29,10 @@ public class WaterShapeController : MonoBehaviour
     // How stiff should our spring be constnat
     [SerializeField] private float _springStiffness = 0.1f;
     [SerializeField] private List<WaterSpring> _springs = new();
+    [Header("Other")]
+    [SerializeField] private SpriteRenderer _dummySprite;
+    [SerializeField] private SoundPlayer _soundPlayer;
+    private float _soundCD;
     #endregion
 
     //============== Setup ==============
@@ -90,7 +94,7 @@ public class WaterShapeController : MonoBehaviour
             wavePoint.transform.localPosition = waterSpline.GetPosition(index);
 
             WaterSpring waterSpring = wavePoint.GetComponent<WaterSpring>();
-            waterSpring.Setup(_spriteShapeController);
+            waterSpring.Setup(this, _spriteShapeController);
             _springs.Add(waterSpring);
         }
     }
@@ -127,6 +131,9 @@ public class WaterShapeController : MonoBehaviour
     #region Function
     private void Update()
     {
+        if (_soundCD > 0)
+            _soundCD -= Time.deltaTime;
+
         _spriteShapeRenderer.color = _dummySprite.color;
     }
 
@@ -166,6 +173,15 @@ public class WaterShapeController : MonoBehaviour
     {
         color.a = 0.1f;
         _dummySprite.DOColor(color, 2f);
+    }
+
+    public void WaterHit()
+    {
+        if (_soundCD <= 0)
+        {
+            _soundPlayer.PlayRandom(false);
+            _soundCD = 1f;
+        }
     }
     #endregion
 }

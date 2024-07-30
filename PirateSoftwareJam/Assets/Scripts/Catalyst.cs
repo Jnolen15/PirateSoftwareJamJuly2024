@@ -22,6 +22,7 @@ public class Catalyst : MonoBehaviour
     private Flower.Energy _energy;
     private Vector2Int _gridPos;
     private Color _thisColor;
+    private SoundPlayer _soundPlayer;
     #endregion
 
     //============== Setup ==============
@@ -38,6 +39,9 @@ public class Catalyst : MonoBehaviour
         _energy = nrg;
 
         ColorCatalyst();
+
+        _soundPlayer = this.GetComponent<SoundPlayer>();
+        _soundPlayer.PlayRandom(true);
     }
     #endregion
 

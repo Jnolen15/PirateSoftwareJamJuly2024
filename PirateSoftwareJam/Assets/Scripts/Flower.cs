@@ -40,6 +40,7 @@ public class Flower : MonoBehaviour
     private Vector2Int _gridPos;
     private GameGrid _grid;
     private SpriteRenderer _sr;
+    private SoundPlayer _soundPlayer;
     #endregion
 
     //============== Setup ==============
@@ -57,7 +58,7 @@ public class Flower : MonoBehaviour
         _sr.DOKill();
     }
 
-    public void Setup(Vector2Int gridPos, GameGrid grid, Flower.Energy nrg)
+    public void Setup(Vector2Int gridPos, GameGrid grid, Flower.Energy nrg, bool playSound)
     {
         _sr = this.GetComponent<SpriteRenderer>();
 
@@ -69,6 +70,10 @@ public class Flower : MonoBehaviour
         _energy = nrg;
 
         ColorFlower();
+
+        _soundPlayer = this.GetComponent<SoundPlayer>();
+        if (playSound)
+            _soundPlayer.PlayRandom(true);
     }
     #endregion
 
