@@ -114,7 +114,7 @@ public class Flower : MonoBehaviour
     {
         float gridSizeY = _grid.GetGridScaleY();
 
-        if (_gridPos.y > (gridSizeY - gridSizeY/2))
+        if (_gridPos.y > ((gridSizeY - gridSizeY/2) - 1))
             _grid.ShowGameEnd();
     }
 

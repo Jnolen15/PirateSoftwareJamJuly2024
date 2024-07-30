@@ -43,8 +43,9 @@ public class GameGrid : MonoBehaviour
     [SerializeField] private int _gridSizeY;
     [SerializeField] private int _minComboSize;
     [SerializeField] private int _newRowSize;
-    [SerializeField] private List<Vector2Int> _newRowInterval;
     [SerializeField] private List<Vector2Int> _scoreIntervals;
+    [SerializeField] private List<Vector2Int> _newRowInterval;
+    [SerializeField] private List<SpriteRenderer> _rowMarkers;
 
     private Dictionary<Vector2Int, FlowerEntry> _flowerDict = new();
     private bool _inGameTick;
@@ -96,6 +97,7 @@ public class GameGrid : MonoBehaviour
         _dropPause = new WaitForSeconds(0.6f);
 
         _newRowCD = _newRowInterval[0].y;
+        UpdateRoundCounter();
 
         // Tile floor
         for (int x = 0; x <= _gridSizeX; x++)
@@ -202,6 +204,17 @@ public class GameGrid : MonoBehaviour
         _orangeBurst.text = _orangeScore.ToString();
         _purpleBurst.text = _purpleScore.ToString();
     }
+
+    private void UpdateRoundCounter()
+    {
+        for (int i = 0; i < _rowMarkers.Count; i++)
+        {
+            if(i < _newRowCD)
+                _rowMarkers[i].color = Color.white;
+            else
+                _rowMarkers[i].color = Color.gray;
+        }
+    }
     #endregion
 
     //============== Game Management ==============
@@ -244,6 +257,8 @@ public class GameGrid : MonoBehaviour
         }
         else
             _newRowCD--;
+
+        UpdateRoundCounter();
 
         GameTick?.Invoke();
 

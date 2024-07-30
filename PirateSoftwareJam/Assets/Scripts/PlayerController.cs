@@ -70,7 +70,7 @@ public class PlayerController : MonoBehaviour
     #region Function
     void Update()
     {
-        if ((Input.GetMouseButtonDown(0)  || Input.GetKeyDown(KeyCode.S)) && _shotLoaded)
+        if (Input.GetKeyDown(KeyCode.S) && _shotLoaded)
             SpawnBullet();
 
         if (Input.GetKeyDown(KeyCode.Space))
