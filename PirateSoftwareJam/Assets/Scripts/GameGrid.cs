@@ -27,9 +27,8 @@ public class GameGrid : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _orangeBurst;
     [SerializeField] private TextMeshProUGUI _purpleBurst;
     [SerializeField] private TextMeshProUGUI _roundNum;
-    [SerializeField] private GameObject _gameOver;
-    [SerializeField] private TextMeshProUGUI _gameOverText;
     [SerializeField] private ComboFX _comboFX;
+    [SerializeField] private GameOverUI _gameOverUI;
     private SoundPlayer _soundPlayer;
 
     [Header("Prefabs")]
@@ -189,10 +188,9 @@ public class GameGrid : MonoBehaviour
     {
         if (_gameIsOver)
             return;
-
         _gameIsOver = true;
-        _gameOver.SetActive(true);
-        _gameOverText.text = "Final Score: " + _score;
+
+        _gameOverUI.ShowGameOverUI((int)_score);
     }
 
     private void UpdateScoreUI()
@@ -547,6 +545,11 @@ public class GameGrid : MonoBehaviour
             return _flowerDict[pos].Flower.GetEnergy();
         else
             return Flower.Energy.White;
+    }
+
+    public bool IsGameOver()
+    {
+        return _gameIsOver;
     }
     #endregion
 }
