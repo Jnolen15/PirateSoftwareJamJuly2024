@@ -54,6 +54,7 @@ public class GameGrid : MonoBehaviour
     private float _purpleScore;
     private float _greenScore;
     private float _orangeScore;
+    private int _highestCombo;
     private bool _gameIsOver;
     private bool _comboScored;
     private Vector3Int _lastCatalystPos;
@@ -190,7 +191,7 @@ public class GameGrid : MonoBehaviour
             return;
         _gameIsOver = true;
 
-        _gameOverUI.ShowGameOverUI((int)_score);
+        _gameOverUI.ShowGameOverUI((int)_score, _highestCombo);
     }
 
     private void UpdateScoreUI()
@@ -411,7 +412,7 @@ public class GameGrid : MonoBehaviour
 
     private IEnumerator ScoreCombo(List<FlowerEntry> flowerList)
     {
-        int count = 1;
+        int count = 0;
         Color coboColor = Color.white;
 
         foreach (FlowerEntry fe in flowerList)
@@ -436,18 +437,21 @@ public class GameGrid : MonoBehaviour
                 _flowerDict.Remove(fe.GridPos);
                 fe.Flower.Score(pointsVal);
 
+                count++;
+
                 _comboFX.transform.position = _gameGrid.GetCellCenterWorld(_lastCatalystPos);
                 _comboFX.Setup(count, coboColor);
 
                 _soundPlayer.PlayMusicalScale(1, count);
-
-                count++;
 
                 yield return _scorePause;
             }
             else
                 Debug.Log("Flower can not be scored! not found in dictionary");
         }
+
+        if (count > _highestCombo)
+            _highestCombo = count;
 
         _soundPlayer.SetPitch(1);
         _comboFX.EndCombo(count);

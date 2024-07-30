@@ -14,10 +14,12 @@ public class GameOverUI : MonoBehaviour
     [SerializeField] private CanvasGroup _content;
     [SerializeField] private TextMeshProUGUI _score;
     [SerializeField] private TextMeshProUGUI _highScore;
+    [SerializeField] private TextMeshProUGUI _highestCombo;
     [SerializeField] private GameObject _newHighScore;
+    [SerializeField] private AudioSource _audioSource;
 
     //============== Function ==============
-    public void ShowGameOverUI(int score)
+    public void ShowGameOverUI(int score, int highestCombo)
     {
         gameObject.SetActive(true);
         AnimateOpen();
@@ -33,6 +35,9 @@ public class GameOverUI : MonoBehaviour
 
         _score.text = score.ToString();
         _highScore.text = highScore.ToString();
+        _highestCombo.text = highestCombo.ToString();
+
+        _audioSource.Play();
     }
 
     private void AnimateOpen()
