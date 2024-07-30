@@ -10,8 +10,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Grid _gameGrid;
     [SerializeField] private VisualSetter _mainPotion;
     [SerializeField] private VisualSetter _backupPotion;
-    [SerializeField] private SpriteRenderer _reticleSR;
-    [SerializeField] private SoundPlayer _soundPlayer;
+    [SerializeField] private SpriteRenderer _broom;
+    [SerializeField] private Sprite _broomCharged;
+    [SerializeField] private Sprite _broomDepleted;
+    private PlayerAnimator _animator;
+    private SoundPlayer _soundPlayer;
 
     [Header("Variables")]
     [SerializeField] private GameObject _bullet;
@@ -30,6 +33,9 @@ public class PlayerController : MonoBehaviour
     #region Setup
     private void Start()
     {
+        _animator = this.GetComponent<PlayerAnimator>();
+        _soundPlayer = this.GetComponent<SoundPlayer>();
+
         GameGrid.GameTick += GameTick;
 
         // Pick an initial backup color
@@ -100,18 +106,20 @@ public class PlayerController : MonoBehaviour
         _gridPos.x += dir;
         transform.position = _gameGrid.GetCellCenterWorld(_gridPos);
         _moveCD = 0.2f;
+
+        _animator.Move(dir);
     }
 
     private void GameTick()
     {
         _shotLoaded = true;
-        _reticleSR.color = Color.black;
+        _broom.sprite = _broomCharged;
     }
 
     private void SpawnBullet()
     {
         _shotLoaded = false;
-        _reticleSR.color = Color.gray;
+        _broom.sprite = _broomDepleted;
 
         bool isCatalyst = false;
         if (_nextEnergy == Flower.Energy.Orange || _nextEnergy == Flower.Energy.Green || _nextEnergy == Flower.Energy.Purple)
