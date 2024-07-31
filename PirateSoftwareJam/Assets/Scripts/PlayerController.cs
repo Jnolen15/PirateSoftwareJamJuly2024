@@ -70,7 +70,7 @@ public class PlayerController : MonoBehaviour
     #region Function
     void Update()
     {
-        if (GameGrid.Instance.IsGameOver())
+        if (GameGrid.Instance.GetNonControllable())
             return;
 
         if (Input.GetKeyDown(KeyCode.S) && _shotLoaded)

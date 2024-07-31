@@ -32,6 +32,8 @@ public class PauseUI : MonoBehaviour
     {
         _paused = !_paused;
         _pauseMenu.SetActive(_paused);
+
+        GameGrid.Instance.SetNonControllable(_paused);
     }
 
     public void SetSFXAudioLevel(float sliderValue)

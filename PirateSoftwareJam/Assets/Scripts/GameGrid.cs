@@ -56,6 +56,8 @@ public class GameGrid : MonoBehaviour
     private float _orangeScore;
     private int _highestCombo;
     private bool _gameIsOver;
+    private bool _nonControllable;
+    private bool _inTutorial;
     private bool _comboScored;
     private Vector3Int _lastCatalystPos;
 
@@ -551,9 +553,24 @@ public class GameGrid : MonoBehaviour
             return Flower.Energy.White;
     }
 
-    public bool IsGameOver()
+    public bool GetNonControllable()
     {
-        return _gameIsOver;
+        if (_gameIsOver)
+            return true;
+        else if (_inTutorial)
+            return true;
+        else
+            return _nonControllable;
+    }
+
+    public void SetInTutorial(bool set)
+    {
+        _inTutorial = set;
+    }
+
+    public void SetNonControllable(bool set)
+    {
+        _nonControllable = set;
     }
     #endregion
 }
